@@ -16,3 +16,5 @@ This project will take at least 40 hours for each person due to the complexity o
 a peer to peer environment. There are multiple complicated components in making this type of
 messaging system where each part has their own caveats. At the same time, testing will
 become more complicated as we will require several active intermediary nodes during testing.
+
+Jerry is gay.
