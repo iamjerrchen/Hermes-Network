@@ -19,4 +19,4 @@ a peer to peer environment. There are multiple complicated components in making 
 messaging system where each part has their own caveats. At the same time, testing will
 become more complicated as we will require several active intermediary nodes during testing.
 
-# Jerry is so gay that everywhere he goes, people turn more straight.
+# Jerry is so gay that everywhere he goes, gay people lose their gayness through osmosis to Jerry
