@@ -1,4 +1,4 @@
-#include "socket.h"
+#include "../main/socket.h"
 
 #include <stdio.h>
 #include <unistd.h> // read()
@@ -12,9 +12,7 @@ int main()
 	char *hello = "Hello from server";
 
 	Socket s;
-	s.create();
-	s.attach(31337);
-	s.listen_port();
+	s.setup_server_sock(31337);
 
 	// Continually listen on the port and accept connections.
 	while(1)

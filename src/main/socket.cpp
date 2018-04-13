@@ -10,7 +10,33 @@ Socket::Socket()
 	this->socket_fd = -1;
 }
 
+Socket::~Socket()
+{
+	/* TODO: Properly close socketfd.
+	 * 0: stop receiving data
+	 * 1: stop transmissing data
+	 * 2: stop receiving and transmitting
+	 */
+	shutdown(this->socket_fd, 2);
+}
+
 /* Server TCP socket methods */
+int Socket::setup_server_sock(int port)
+{
+	int success = 0;
+	if(create())
+	{
+		if(attach(port))
+		{
+			if(listen_port())
+			{
+				success = 1;
+			}
+		}
+	}
+	return success;
+}
+
 int Socket::create()
 {
 	// create socket file descriptor

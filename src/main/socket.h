@@ -14,11 +14,13 @@ private:
 public:
 
 	Socket();
+	~Socket();
+
+	// Prepare socket to accept connections
+	int setup_server_sock(int port);
 
 	// create the socket
 	int create();
-
-	/* Server TCP socket methods */
 	// Attach the socket to a port
 	int attach(int port);
 	// Listen on the socket
