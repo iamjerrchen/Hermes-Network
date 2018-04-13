@@ -1,31 +1,29 @@
 
 # Makefile for P2P Messaging Network Project
-
+# All executables will be stored in ./bin/proj/
+# ***Unit Test Makefile located in test directory
 
 ### Flags used for compilation ###
-CPPFLAGS=-Wall -fno-builtin -fno-stack-protector
 CPPC=g++
-
-
-### client ###
-CLIENT_SRC=./src/temp/client.cpp
-
-client: $(CLIENT_SRC)
-	$(CPPC) $(CPPFLAGS) -o $@ $<
+CPPFLAGS=-Wall -fno-builtin -fno-stack-protector
+BIN_DIR=./bin/proj/$@ $<
 
 
 ### server test ###
-SERVER_TEST_SRC=./src/test/server_test.cpp
+# MAIN_SRC= # project main file
 	# $(wildcard ./src/main/*.cpp)
-SERVER_TEST_INC=./src/main/socket.cpp
-SERVER_TEST_DEP=./bin/server_test.d
+# MAIN_INC= # Local files included in the project main file
 
-server_test: $(SERVER_TEST_SRC)
-	$(CPPC) $(CPPFLAGS) $(SERVER_TEST_INC) -o $@ $<
+# P2P: $(MAIN_SRC)
+	# $(CPPC) $(CPPFLAGS) $(MAIN_INC) -o $(BIN_DIR)
+
+
+### all ###
+# all:
 
 
 ### cleanup ###
 .PHONY: clean
 clean:
-	rm -rf client server_test
+	rm -rf ./bin/proj/*
 
