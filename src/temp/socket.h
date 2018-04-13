@@ -4,12 +4,11 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-
 class Socket {
 
 private:
 
-	const int port = 8080; // consider making global in namespace
+	static const int port = 8080; // consider making global in namespace
 	struct sockaddr_in address;
 	int socket_fd; // -1 : undefined
 
@@ -21,9 +20,6 @@ public:
 	int listen_conn();
 	int accept_conn();
 
-
-
-}
-
+};
 
 #endif

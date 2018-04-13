@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-// #include <unistd.h>
 
 Socket::Socket()
 {
@@ -32,7 +31,7 @@ int Socket::attach()
 
 	// setting socket options
 	ret_check = setsockopt(this->socket_fd, SOL_SOCKET, SO_REUSEADDR /*| SO_RESUSEPORT*/, &opt, sizeof(opt));
-	if(!ret_check)
+	if(ret_check)
 	{
 		perror("Failed to set socket options.");
 		return 0;
