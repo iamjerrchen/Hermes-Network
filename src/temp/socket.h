@@ -8,16 +8,22 @@ class Socket {
 
 private:
 
-	static const int port = 8080; // consider making global in namespace
 	struct sockaddr_in address;
 	int socket_fd; // -1 : undefined
 
 public:
 
 	Socket();
+
+	// create the socket
 	int create();
-	int attach();
-	int listen_conn();
+
+	/* Server TCP socket methods */
+	// Attach the socket to a port
+	int attach(int port);
+	// Listen on the socket
+	int listen_port();
+	// Accept incoming connection
 	int accept_conn();
 
 };

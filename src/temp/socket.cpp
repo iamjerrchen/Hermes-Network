@@ -7,10 +7,10 @@ Socket::Socket()
 {
 	(this->address).sin_family = AF_INET;
 	(this->address).sin_addr.s_addr = INADDR_ANY;
-	(this->address).sin_port = htons(this->port);
 	this->socket_fd = -1;
 }
 
+/* Server TCP socket methods */
 int Socket::create()
 {
 	// create socket file descriptor
@@ -24,20 +24,22 @@ int Socket::create()
 	return 1;
 }
 
-int Socket::attach()
+int Socket::attach(int port)
 {
 	int opt = 1;
 	int ret_check;
 
 	// setting socket options
-	ret_check = setsockopt(this->socket_fd, SOL_SOCKET, SO_REUSEADDR /*| SO_RESUSEPORT*/, &opt, sizeof(opt));
+	ret_check = setsockopt(this->socket_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt));
 	if(ret_check)
 	{
 		perror("Failed to set socket options.");
 		return 0;
 	}
 
-	ret_check = bind(this->socket_fd, (struct sockaddr*) &this->address, sizeof(address));
+	// attach socket to port
+	(this->address).sin_port = htons(port);
+	ret_check = bind(this->socket_fd, (struct sockaddr*) &(this->address), sizeof(address));
 	if(ret_check < 0)
 	{
 		perror("Failed to bind to port.");
@@ -47,9 +49,11 @@ int Socket::attach()
 	return 1;
 }
 
-int Socket::listen_conn()
+int Socket::listen_port()
 {
 	int ret_check;
+
+	// TODO: Consider other max backlog values
 	// 3 : max backlog of connections
 	ret_check = listen(this->socket_fd, 3);
 	if(ret_check < 0)
@@ -64,8 +68,10 @@ int Socket::listen_conn()
 int Socket::accept_conn()
 {
 	int sock, addrlen;
+
+	// accept incoming connection
 	addrlen = sizeof(this->address);
-	sock = accept(this->socket_fd, (struct sockaddr*) &this->address, (socklen_t*) &addrlen);
+	sock = accept(this->socket_fd, (struct sockaddr*) &(this->address), (socklen_t*) &addrlen);
 	if(sock < 0)
 	{
 		perror("Failed to accept sonnection.");
@@ -73,3 +79,31 @@ int Socket::accept_conn()
 
 	return sock;
 }
+
+/* Client TCP socket methods
+int Socket::set_ip_address(char ip[])
+{
+	// TODO:
+	// Change argument to account for malicious inputs.
+	// Implement input sanitation.
+	 
+	int ret_check;
+	ret_check = inet_pton(AF_INET, ip, &(this->address).sin_addr);
+	if(ret_check <= 0)
+	{
+		perror("Invalid address / Address not supported.");
+		return 0;
+	}
+
+	return 1;
+}
+
+int Socket::client_connect()
+{
+	int ret_check, sock = 0;
+	if(connect(sock,))
+
+}
+*/
+
+
