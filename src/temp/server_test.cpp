@@ -13,14 +13,18 @@ int main()
 
 	Socket s;
 	s.create();
-	s.attach();
-	s.listen_conn();
-	new_socket = s.accept_conn();
+	s.attach(31337);
+	s.listen_port();
 
-	valread = read(new_socket, buffer, 1024);
-	printf("%s\n", buffer);
-	send(new_socket, hello, strlen(hello), 0);
-	printf("Hello message sent\n");
+	// Continually listen on the port and accept connections.
+	while(1)
+	{
+		new_socket = s.accept_conn();
+		valread = read(new_socket, buffer, 1024);
+		printf("%s\n", buffer);
+		send(new_socket, hello, strlen(hello), 0);
+		printf("Hello message sent\n");
+	}
 	return 0;
 }
 
