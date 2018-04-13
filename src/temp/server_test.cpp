@@ -20,7 +20,7 @@ int main()
 	valread = read(new_socket, buffer, 1024);
 	printf("%s\n", buffer);
 	send(new_socket, hello, strlen(hello), 0);
-	std::cout << "Hello message sent\n" std::endl;
+	printf("Hello message sent\n");
 	return 0;
 }
 
