@@ -26,7 +26,7 @@ server_test: $(SERVER_TEST_SRC)
 
 
 ### all ###
-all: client server_test
+client_server_test: client server_test
 
 
 ### cleanup ###

@@ -17,7 +17,7 @@ public:
 	~Socket();
 
 	// Prepare socket to accept connections
-	int setup_server_sock(int port);
+	int setup_server_socket(int port);
 
 	// create the socket
 	int create();

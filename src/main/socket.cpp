@@ -21,7 +21,7 @@ Socket::~Socket()
 }
 
 /* Server TCP socket methods */
-int Socket::setup_server_sock(int port)
+int Socket::setup_server_socket(int port)
 {
 	int success = 0;
 	if(create())

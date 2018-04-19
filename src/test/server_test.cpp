@@ -12,7 +12,7 @@ int main()
 	char *hello = "Hello from server";
 
 	Socket s;
-	s.setup_server_sock(31337);
+	s.setup_server_socket(31337);
 
 	// Continually listen on the port and accept connections.
 	while(1)
