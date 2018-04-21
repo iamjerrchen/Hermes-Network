@@ -12,20 +12,22 @@ private:
 	int port; // definable by caller
 	int socket_fd; // -1 : undefined
 
+	int max_queued_conn; // maximum queued connections
+
 public:
 
 	Socket();
 	~Socket();
 
 	// Prepare socket to accept connections
-	int setup_server_socket(int port);
+	bool setup_server_socket(int port);
 
 	// create the socket
-	int create();
+	bool create();
 	// Attach the socket to a port
-	int attach(int port);
+	bool attach(int port);
 	// Listen on the socket
-	int listen_port();
+	bool listen_port();
 	// Accept incoming connection
 	int accept_conn();
 

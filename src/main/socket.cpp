@@ -19,6 +19,8 @@ Socket::Socket()
 	(this->address).sin_addr.s_addr = INADDR_ANY;
 	this->port = -1;
 	this->socket_fd = -1;
+	// TODO: Consider other max backlog values
+	this->max_queued_conn = 5;
 }
 
 Socket::~Socket()
@@ -32,7 +34,7 @@ Socket::~Socket()
 }
 
 /* Server TCP socket methods */
-int Socket::setup_server_socket(int port)
+bool Socket::setup_server_socket(int port)
 {
 	int success = 0;
 	this->port = port;
@@ -49,7 +51,7 @@ int Socket::setup_server_socket(int port)
 	return success;
 }
 
-int Socket::create()
+bool Socket::create()
 {
 	// create socket file descriptor
 	this->socket_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -62,7 +64,7 @@ int Socket::create()
 	return 1;
 }
 
-int Socket::attach(int port)
+bool Socket::attach(int port)
 {
 	int opt = 1;
 	int ret_check;
@@ -80,20 +82,19 @@ int Socket::attach(int port)
 	ret_check = bind(this->socket_fd, (struct sockaddr*) &(this->address), sizeof(address));
 	if(ret_check < 0)
 	{
+		// Failure to bind to port should return with 0 instead of exit.
 		syslog(LOG_ERR, "[socket] Failed to bind to port %d: %s", port, strerror(errno));
-		exit(EXIT_FAILURE);
+		return 0;
 	}
 
 	return 1;
 }
 
-int Socket::listen_port()
+bool Socket::listen_port()
 {
 	int ret_check;
 
-	// TODO: Consider other max backlog values
-	// 3 : max backlog of connections
-	ret_check = listen(this->socket_fd, 3);
+	ret_check = listen(this->socket_fd, this->max_queued_conn);
 	if(ret_check < 0)
 	{
 		syslog(LOG_ERR, "[socket] Failed to listen on port %d: %s", this->port, strerror(errno));
@@ -103,6 +104,7 @@ int Socket::listen_port()
 	return 1;
 }
 
+// 
 int Socket::accept_conn()
 {
 	int sock, addrlen;
