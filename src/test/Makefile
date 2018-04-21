@@ -25,15 +25,15 @@ server_test: $(SERVER_TEST_SRC)
 	$(CPPC) $(CPPFLAGS) $(SERVER_TEST_INC) -o $(BIN_DIR)
 
 
+### client_server package ###
+client_server_test: client server_test
+
+
 ### daemon test ###
 DAEMON_TEST_SRC=./daemon_test.cpp
-DAEMON_TEST_INC=./../temp/daemonize.cpp
+DAEMON_TEST_INC=./../main/daemonize.cpp ./../main/socket.cpp
 daemon_test: $(DAEMON_TEST_SRC)
 	$(CPPC) $(CPPFLAGS) $(DAEMON_TEST_INC) -o $(BIN_DIR)
-
-
-### all ###
-client_server_test: client server_test
 
 
 ### cleanup ###
