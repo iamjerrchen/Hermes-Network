@@ -1,5 +1,5 @@
-#ifndef P2P_SOCKET_H_
-#define P2P_SOCKET_H_
+#ifndef P2P_MAIN_SOCKET_H_
+#define P2P_MAIN_SOCKET_H_
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -9,6 +9,7 @@ class Socket {
 private:
 
 	struct sockaddr_in address;
+	int port; // definable by caller
 	int socket_fd; // -1 : undefined
 
 public:
