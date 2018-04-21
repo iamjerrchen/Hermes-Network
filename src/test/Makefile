@@ -36,6 +36,13 @@ daemon_test: $(DAEMON_TEST_SRC)
 	$(CPPC) $(CPPFLAGS) $(DAEMON_TEST_INC) -o $(BIN_DIR)
 
 
+### po_node_test ###
+PO_NODE_TEST_SRC=./po_node_test.cpp
+PO_NODE_TEST_INC=./../main/po_node.cpp
+po_node_test: $(PO_NODE_TEST_SRC)
+	$(CPPC) $(CPPFLAGS) $(PO_NODE_TEST_INC) -o $(BIN_DIR)
+
+
 ### cleanup ###
 .PHONY: clean
 clean:
