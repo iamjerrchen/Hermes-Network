@@ -1,5 +1,10 @@
-#include "socket.h"
+/* socket.cpp
+ *
+ *
+ *
+ */
 
+#include "socket.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,7 +55,7 @@ int Socket::create()
 	this->socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if(this->socket_fd == 0)
 	{
-		syslog(LOG_ERR, "[Socket] Failed to create server socket: %s", strerror(errno));
+		syslog(LOG_ERR, "[socket] Failed to create server socket: %s", strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
@@ -66,7 +71,7 @@ int Socket::attach(int port)
 	ret_check = setsockopt(this->socket_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt));
 	if(ret_check)
 	{
-		syslog(LOG_ERR, "[Socket] Failed to set socket options: %s", strerror(errno));
+		syslog(LOG_ERR, "[socket] Failed to set socket options: %s", strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
@@ -75,7 +80,7 @@ int Socket::attach(int port)
 	ret_check = bind(this->socket_fd, (struct sockaddr*) &(this->address), sizeof(address));
 	if(ret_check < 0)
 	{
-		syslog(LOG_ERR, "[Socket] Failed to bind to port %d: %s", port, strerror(errno));
+		syslog(LOG_ERR, "[socket] Failed to bind to port %d: %s", port, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
@@ -91,7 +96,7 @@ int Socket::listen_port()
 	ret_check = listen(this->socket_fd, 3);
 	if(ret_check < 0)
 	{
-		syslog(LOG_ERR, "[Socket] Failed to listen on port %d: %s", this->port, strerror(errno));
+		syslog(LOG_ERR, "[socket] Failed to listen on port %d: %s", this->port, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
@@ -107,7 +112,7 @@ int Socket::accept_conn()
 	sock = accept(this->socket_fd, (struct sockaddr*) &(this->address), (socklen_t*) &addrlen);
 	if(sock < 0)
 	{
-		syslog(LOG_WARNING, "[Socket] Failed to accept connection: %s", strerror(errno));
+		syslog(LOG_WARNING, "[socket] Failed to accept connection: %s", strerror(errno));
 	}
 
 	return sock;

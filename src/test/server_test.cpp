@@ -1,3 +1,8 @@
+/* server_test.cpp
+ *	Test code for server socket.
+ *	This test is paired with the client test.
+ */
+
 #include "../main/socket.h"
 
 #include <stdio.h>
