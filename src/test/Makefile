@@ -39,6 +39,6 @@ client_server_test: client server_test
 ### cleanup ###
 .PHONY: clean
 clean:
-	rm -rf ./../../bin/test*
+	rm -rf ./../../bin/test/*
 
 
