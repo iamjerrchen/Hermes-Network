@@ -8,8 +8,6 @@
 #include <syslog.h>
 #include <errno.h>
 
-#include <iostream>
-
 PO_Node::PO_Node()
 {
 	unsigned int init_idx;
