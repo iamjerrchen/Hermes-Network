@@ -14,7 +14,11 @@ private:
 public:
 
 	PO_Node();
+
+	// Big Three
 	~PO_Node();
+	PO_Node(const PO_Node &other);
+	PO_Node & operator=(const PO_Node &rhs);
 
 
 	bool add_neighbor(char *ip);
