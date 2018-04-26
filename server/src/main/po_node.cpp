@@ -10,20 +10,35 @@
 
 PO_Node::PO_Node()
 {
-	this->client_connection = NULL;
+	client_connection = NULL;
+	neighbor_listener.setup_server_socket(SERVER_PORT);
 
 	unsigned int init_idx;
 	for(init_idx = 0; init_idx < MAX_NEIGHBORS; init_idx++)
 	{
-		(this->neighbor_ips)[init_idx] = 0;
-		(this->filled)[init_idx] = false;
+		neighbor_ips[init_idx] = 0;
+		filled[init_idx] = false;
+		// neighbor_threads[init_idx] = NULL;
 	}
 }
 
 // destructor
 PO_Node::~PO_Node()
 {
-	delete this->client_connection;
+	// join all threads and delete
+	/*for(unsigned int del_idx = 0; del_idx < MAX_NEIGHBORS; del_idx++)
+	{	// if thread exists
+		if(filled[del_idx])
+		{	// if for some reason thread doesn't have an object
+			if(NULL != neighbor_threads[del_idx])
+			{	// TODO: Consider detach or ensure that threads dont stall
+				(neighbor_threads[del_idx])->join();
+				delete neighbor_threads[del_idx];
+			}
+		}
+	}*/
+
+	delete client_connection;
 }
 
 // copy constructor
@@ -33,8 +48,8 @@ PO_Node::PO_Node(const PO_Node &other)
 	{	// this->max_neighbors is const so they should have the same initialization
 		for(unsigned int cpy_idx = 0; cpy_idx < MAX_NEIGHBORS; cpy_idx++)
 		{
-			(this->neighbor_ips)[cpy_idx] = (other.neighbor_ips)[cpy_idx];
-			(this->filled)[cpy_idx] = (other.filled)[cpy_idx];
+			neighbor_ips[cpy_idx] = (other.neighbor_ips)[cpy_idx];
+			filled[cpy_idx] = (other.filled)[cpy_idx];
 		}
 	}
 }
@@ -46,17 +61,25 @@ PO_Node & PO_Node::operator=(const PO_Node &rhs)
 	{	// this->max_neighbors is const so they should have the same initialization
 		for(unsigned int cpy_idx = 0; cpy_idx < MAX_NEIGHBORS; cpy_idx++)
 		{
-			(this->neighbor_ips)[cpy_idx] = (rhs.neighbor_ips)[cpy_idx];
-			(this->filled)[cpy_idx] = (rhs.filled)[cpy_idx];
+			neighbor_ips[cpy_idx] = (rhs.neighbor_ips)[cpy_idx];
+			filled[cpy_idx] = (rhs.filled)[cpy_idx];
 		}
 	}
 
 	return *this;
 }
 
-// spawns a thread to listen to a port.
-bool PO_Node::spawn_listen_thread()
+void PO_Node::server_listen()
 {
+
+}
+
+// spawns a thread to listen to a port.
+bool PO_Node::spawn_server_listener(unsigned int thread_idx)
+{
+	// initialize pointer with an object. Provide port, 
+	// neighbor_threads[thread_idx] = new std::thread(server_listen);
+	// provide it a port
 	return false;
 }
 
@@ -65,9 +88,11 @@ bool PO_Node::spawn_client_listener()
 	client_connection = new Socket();
 	if(!client_connection->setup_server_socket(CLIENT_PORT))
 	{
+		syslog(LOG_ALERT, "[po_node] Server is unable to create client listener for port: %u.", CLIENT_PORT);
 		return false;
 	}
 
+	syslog(LOG_NOTICE, "[po_node] Server has spawned client listener. Ready to accept connections.");
 	return true;
 }
 
@@ -94,11 +119,11 @@ bool PO_Node::add_neighbor(char *ip)
 	// find last available slot and if ip already exists
 	while(filled_idx < MAX_NEIGHBORS)
 	{	
-		if( !((this->filled)[filled_idx]) ) // empty slot
+		if( !(filled[filled_idx]) ) // empty slot
 		{
 			avail_idx = filled_idx;
 		}
-		else if((this->neighbor_ips)[filled_idx] == ip_val) // ip exists
+		else if(neighbor_ips[filled_idx] == ip_val) // ip exists
 		{			
 			ip_exists = true;
 		}
@@ -108,10 +133,10 @@ bool PO_Node::add_neighbor(char *ip)
 	// adding new neighbor
 	if(!ip_exists)
 	{
-		(this->filled)[avail_idx] = true;
-		(this->neighbor_ips)[avail_idx] = ip_val;
+		filled[avail_idx] = true;
+		neighbor_ips[avail_idx] = ip_val;
 		success = true;
-		spawn_listen_thread();
+		// spawn_server_listener(avail_idx);
 	}
 
 	// unable to add more neighbors
@@ -148,13 +173,13 @@ bool PO_Node::remove_neighbor(char *ip)
 	// iterate over the neighbors, and remove the first matching ip
 	while(filled_idx < MAX_NEIGHBORS)
 	{
-		if((this->filled)[filled_idx])
+		if(filled[filled_idx])
 		{
 			// remove the matching neighbor
-			if(ip_check == (this->neighbor_ips)[filled_idx])
+			if(ip_check == neighbor_ips[filled_idx])
 			{
-				(this->filled)[filled_idx] = false;
-				(this->neighbor_ips)[filled_idx] = 0;
+				filled[filled_idx] = false;
+				neighbor_ips[filled_idx] = 0;
 				success = true;
 				break;
 			}
