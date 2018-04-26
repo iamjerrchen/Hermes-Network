@@ -2,18 +2,24 @@
 #define P2P_MAIN_PO_NODE_H_
 
 #include <thread>
+#include "socket.h"
 
 class PO_Node {
 
 private:
 
 	// private variables
-	static const unsigned int max_neighbors = 3;
-	unsigned long *neighbor_ips;
-	bool *filled; // determines which neighbors are filled
+	static const unsigned int MAX_NEIGHBORS = 3;
+	static const unsigned int CLIENT_PORT = 80085;
+
+	unsigned long neighbor_ips[MAX_NEIGHBORS];
+	bool filled[MAX_NEIGHBORS]; // determines which neighbors are filled
+	Socket *client_connection;
+
 
 	// private functions
 	bool spawn_listen_thread();
+	bool spawn_client_listener();
 
 public:
 

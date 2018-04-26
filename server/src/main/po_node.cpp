@@ -10,10 +10,10 @@
 
 PO_Node::PO_Node()
 {
+	this->client_connection = NULL;
+
 	unsigned int init_idx;
-	this->neighbor_ips = new unsigned long[this->max_neighbors];
-	this->filled = new bool[this->max_neighbors];
-	for(init_idx = 0; init_idx < this->max_neighbors; init_idx++)
+	for(init_idx = 0; init_idx < MAX_NEIGHBORS; init_idx++)
 	{
 		(this->neighbor_ips)[init_idx] = 0;
 		(this->filled)[init_idx] = false;
@@ -23,8 +23,7 @@ PO_Node::PO_Node()
 // destructor
 PO_Node::~PO_Node()
 {
-	delete [] this->neighbor_ips;
-	delete [] this->filled;
+	delete this->client_connection;
 }
 
 // copy constructor
@@ -32,9 +31,7 @@ PO_Node::PO_Node(const PO_Node &other)
 {
 	if(this != &other)
 	{	// this->max_neighbors is const so they should have the same initialization
-		this->neighbor_ips = new unsigned long[this->max_neighbors];
-		this->filled = new bool[this->max_neighbors];
-		for(unsigned int cpy_idx = 0; cpy_idx < this->max_neighbors; cpy_idx++)
+		for(unsigned int cpy_idx = 0; cpy_idx < MAX_NEIGHBORS; cpy_idx++)
 		{
 			(this->neighbor_ips)[cpy_idx] = (other.neighbor_ips)[cpy_idx];
 			(this->filled)[cpy_idx] = (other.filled)[cpy_idx];
@@ -47,9 +44,7 @@ PO_Node & PO_Node::operator=(const PO_Node &rhs)
 {
 	if(this != &rhs)
 	{	// this->max_neighbors is const so they should have the same initialization
-		this->neighbor_ips = new unsigned long[this->max_neighbors];
-		this->filled = new bool[this->max_neighbors];
-		for(unsigned int cpy_idx = 0; cpy_idx < this->max_neighbors; cpy_idx++)
+		for(unsigned int cpy_idx = 0; cpy_idx < MAX_NEIGHBORS; cpy_idx++)
 		{
 			(this->neighbor_ips)[cpy_idx] = (rhs.neighbor_ips)[cpy_idx];
 			(this->filled)[cpy_idx] = (rhs.filled)[cpy_idx];
@@ -62,7 +57,18 @@ PO_Node & PO_Node::operator=(const PO_Node &rhs)
 // spawns a thread to listen to a port.
 bool PO_Node::spawn_listen_thread()
 {
+	return false;
+}
 
+bool PO_Node::spawn_client_listener()
+{
+	client_connection = new Socket();
+	if(!client_connection->setup_server_socket(CLIENT_PORT))
+	{
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -86,7 +92,7 @@ bool PO_Node::add_neighbor(char *ip)
 
 	ip_val = temp.s_addr;
 	// find last available slot and if ip already exists
-	while(filled_idx < this->max_neighbors)
+	while(filled_idx < MAX_NEIGHBORS)
 	{	
 		if( !((this->filled)[filled_idx]) ) // empty slot
 		{
@@ -116,7 +122,7 @@ bool PO_Node::add_neighbor(char *ip)
 	}
 	else if(!success)
 	{
-		syslog(LOG_NOTICE, "[po_node] Max %d neighbors reached. Unable to add more.", this->max_neighbors);
+		syslog(LOG_NOTICE, "[po_node] Max %d neighbors reached. Unable to add more.", MAX_NEIGHBORS);
 	}
 	return success;
 }
@@ -140,7 +146,7 @@ bool PO_Node::remove_neighbor(char *ip)
 
 	ip_check = temp.s_addr;
 	// iterate over the neighbors, and remove the first matching ip
-	while(filled_idx < this->max_neighbors)
+	while(filled_idx < MAX_NEIGHBORS)
 	{
 		if((this->filled)[filled_idx])
 		{
