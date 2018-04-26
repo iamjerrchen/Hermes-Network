@@ -59,6 +59,13 @@ PO_Node & PO_Node::operator=(const PO_Node &rhs)
 	return *this;
 }
 
+// spawns a thread to listen to a port.
+bool PO_Node::spawn_listen_thread()
+{
+
+}
+
+
 // TODO: Change parameter to make it secure from possible overflows
 bool PO_Node::add_neighbor(char *ip)
 {
@@ -92,11 +99,13 @@ bool PO_Node::add_neighbor(char *ip)
 		filled_idx++;
 	}
 
+	// adding new neighbor
 	if(!ip_exists)
 	{
 		(this->filled)[avail_idx] = true;
 		(this->neighbor_ips)[avail_idx] = ip_val;
 		success = true;
+		spawn_listen_thread();
 	}
 
 	// unable to add more neighbors
