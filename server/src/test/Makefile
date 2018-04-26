@@ -6,7 +6,7 @@
 ### Flags used for compilation ###
 CPPC=g++
 CPPFLAGS=-Wall -fno-builtin -fno-stack-protector
-BIN_DIR=./../../bin/test/$@ $<
+BIN_DIR=./../../../bin/test/$@ $<
 
 
 ### client ###
@@ -46,6 +46,6 @@ po_node_test: $(PO_NODE_TEST_SRC)
 ### cleanup ###
 .PHONY: clean
 clean:
-	rm -rf ./../../bin/test/*
+	rm -rf ./../../../bin/test/*
 
 
