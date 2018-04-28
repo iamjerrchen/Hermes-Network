@@ -32,7 +32,7 @@ int main()
 	// attempt to add the same ip multiple times
 	for(int x = 0; x < 4; x++)
 	{
-		if(server.add_neighbor((char*)ip1.data()))
+		if(server.add_neighbor_ip((char*)ip1.data()))
 		{
 			std::cout << "Successfully added ip: " + ip1 << std::endl;
 		}
@@ -44,7 +44,7 @@ int main()
 	// print_filled(server);
 
 	// add other two ips
-	if(server.add_neighbor((char*)ip2.data()))
+	if(server.add_neighbor_ip((char*)ip2.data()))
 	{
 		std::cout << "Successfully added ip: " + ip2 << std::endl;
 	}
@@ -52,7 +52,7 @@ int main()
 	{
 		std::cout << "Unable to add ip: " + ip2 << std::endl;
 	}
-	if(server.add_neighbor((char*)ip3.data()))
+	if(server.add_neighbor_ip((char*)ip3.data()))
 	{
 		std::cout << "Successfully added ip: " + ip3 << std::endl;
 	}
@@ -62,7 +62,7 @@ int main()
 	}
 
 	// remove second ip
-	if(server.remove_neighbor((char*)ip2.data())) {
+	if(server.remove_neighbor_ip((char*)ip2.data())) {
 		std::cout << "Successfully removed ip: " + ip2 << std::endl;
 	}
 	// print_filled(server);

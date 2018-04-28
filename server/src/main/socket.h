@@ -21,15 +21,21 @@ public:
 
 	// Prepare socket to accept connections
 	bool setup_server_socket(int port);
+	// Accept incoming connection
+	int accept_conn();
+	// Prepare socket to initiate connection
+	int setup_client_socket(int port, char* ip);
 
+	// connect to the target address
+	bool connect_server();
+	// configure class address
+	bool configure_address(int port, char* ip);
 	// create the socket
 	bool create();
 	// Attach the socket to a port
 	bool attach(int port);
 	// Listen on the socket
 	bool listen_port();
-	// Accept incoming connection
-	int accept_conn();
 
 };
 

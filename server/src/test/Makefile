@@ -10,10 +10,11 @@ BIN_DIR=./../../../bin/test/$@ $<
 
 
 ### client ###
-CLIENT_SRC=./client.cpp
+CLIENT_TEST_SRC=./client.cpp
+CLIENT_TEST_INC=./../main/socket.cpp
 
-client: $(CLIENT_SRC)
-	$(CPPC) $(CPPFLAGS) -o $(BIN_DIR)
+client_test: $(CLIENT_TEST_SRC)
+	$(CPPC) $(CPPFLAGS) $(CLIENT_TEST_INC) -o $(BIN_DIR)
 
 
 ### server test ###
@@ -26,7 +27,7 @@ server_test: $(SERVER_TEST_SRC)
 
 
 ### client_server package ###
-client_server_test: client server_test
+client_server_test: client_test server_test
 
 
 ### daemon test ###

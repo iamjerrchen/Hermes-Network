@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <arpa/inet.h>
 // system logging
 #include <string.h>
 #include <syslog.h>
@@ -15,8 +16,7 @@
 
 Socket::Socket()
 {
-	(this->address).sin_family = AF_INET;
-	(this->address).sin_addr.s_addr = INADDR_ANY;
+	memset(&(this->address), '0', sizeof(this->address));
 	this->port = -1;
 	this->socket_fd = -1;
 	// TODO: Consider other max backlog values
@@ -51,19 +51,63 @@ bool Socket::setup_server_socket(int port)
 	return success;
 }
 
+// port = port to connect to
+int Socket::setup_client_socket(int port, char* ip)
+{
+	int success = 0;
+	this->port = port;
+	if(create())
+	{
+		if(configure_address(port, ip))
+		{
+			if(connect_server())
+			{
+				return this->socket_fd;				
+			}
+		}
+	}
+	return -1;
+}
+
+// used by client to connect to server address, similar to accept
+bool Socket::connect_server()
+{
+	if(connect(this->socket_fd, (struct sockaddr *)&(this->address), sizeof(this->address)) < 0)
+	{
+		syslog(LOG_WARNING, "[socket] Failed to connect to server.");
+		return false;
+	}
+	return true;
+}
+
+// used by client to create server address
+bool Socket::configure_address(int port, char* ip)
+{
+	(this->address).sin_family = AF_INET;
+	(this->address).sin_port = htons(port);
+	if(inet_pton(AF_INET, ip, &(this->address).sin_addr) <= 0)
+	{
+		syslog(LOG_ERR, "[socket] Can't configure. Invalid address or address not supported: %s", strerror(errno));
+		return false;
+	}
+	return true;
+}
+
+// used by both client and server
 bool Socket::create()
 {
 	// create socket file descriptor
 	this->socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if(this->socket_fd == 0)
 	{
-		syslog(LOG_ERR, "[socket] Failed to create server socket: %s", strerror(errno));
+		syslog(LOG_ERR, "[socket] Failed to create a socket: %s", strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
 	return 1;
 }
 
+// used by server to bind to a port
 bool Socket::attach(int port)
 {
 	int opt = 1;
@@ -78,6 +122,8 @@ bool Socket::attach(int port)
 	}
 
 	// attach socket to port
+	(this->address).sin_family = AF_INET;
+	(this->address).sin_addr.s_addr = INADDR_ANY;
 	(this->address).sin_port = htons(port);
 	ret_check = bind(this->socket_fd, (struct sockaddr*) &(this->address), sizeof(address));
 	if(ret_check < 0)
@@ -90,6 +136,7 @@ bool Socket::attach(int port)
 	return 1;
 }
 
+// used by server to listen on a port
 bool Socket::listen_port()
 {
 	int ret_check;
@@ -104,7 +151,7 @@ bool Socket::listen_port()
 	return 1;
 }
 
-// 
+// used by server to accept incoming connections
 int Socket::accept_conn()
 {
 	int sock, addrlen;
