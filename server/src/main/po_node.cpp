@@ -8,10 +8,18 @@
 #include <syslog.h>
 #include <errno.h>
 
+/* 
+ * @purpose:
+ * 
+ * @param:
+ *
+ * @return:	
+ *
+ */
 PO_Node::PO_Node()
 {
 	client_connection = NULL;
-	neighbor_listener.setup_server_socket(SERVER_PORT);
+	neighbor_server_sock.setup_server_socket(SERVER_PORT);
 
 	unsigned int init_idx;
 	for(init_idx = 0; init_idx < MAX_NEIGHBORS; init_idx++)
@@ -20,8 +28,20 @@ PO_Node::PO_Node()
 		filled[init_idx] = false;
 		// neighbor_threads[init_idx] = NULL;
 	}
+
+	// request for neighbor nodes from super node.
+
+	// call add neighbor for each neighbor ip returned
 }
 
+/* 
+ * @purpose:
+ * 
+ * @param:
+ *
+ * @return:	
+ *
+ */
 // destructor
 PO_Node::~PO_Node()
 {
@@ -41,6 +61,14 @@ PO_Node::~PO_Node()
 	delete client_connection;
 }
 
+/* 
+ * @purpose:
+ * 
+ * @param:
+ *
+ * @return:	
+ *
+ */
 // copy constructor
 PO_Node::PO_Node(const PO_Node &other)
 {
@@ -54,6 +82,14 @@ PO_Node::PO_Node(const PO_Node &other)
 	}
 }
 
+/* 
+ * @purpose:
+ * 
+ * @param:
+ *
+ * @return:	
+ *
+ */
 // assignment overload
 PO_Node & PO_Node::operator=(const PO_Node &rhs)
 {
@@ -69,11 +105,27 @@ PO_Node & PO_Node::operator=(const PO_Node &rhs)
 	return *this;
 }
 
+/* 
+ * @purpose:
+ * 
+ * @param:
+ *
+ * @return:	
+ *
+ */
 void PO_Node::server_listen()
 {
 
 }
 
+/* 
+ * @purpose:
+ * 
+ * @param:
+ *
+ * @return:	
+ *
+ */
 // spawns a thread to listen to a port.
 bool PO_Node::spawn_server_listener(unsigned int thread_idx)
 {
@@ -83,6 +135,14 @@ bool PO_Node::spawn_server_listener(unsigned int thread_idx)
 	return false;
 }
 
+/* 
+ * @purpose:
+ * 
+ * @param:
+ *
+ * @return:	
+ *
+ */
 bool PO_Node::spawn_client_listener()
 {
 	client_connection = new Socket();
@@ -97,8 +157,87 @@ bool PO_Node::spawn_client_listener()
 }
 
 
+/* 
+ * @purpose:
+ * 
+ * @param:
+ *
+ * @return:	
+ *
+ */
 // TODO: Change parameter to make it secure from possible overflows
-bool PO_Node::add_neighbor(char *ip)
+// remove neighbor provided string ip
+bool PO_Node::add_neighbor_ip(char *ip)
+{
+	unsigned long ip_val;
+	struct in_addr temp;
+
+	if(inet_aton(ip, &temp) == 0)
+	{
+		syslog(LOG_NOTICE, "[po_node] Invalid ip address string provided.");
+		return false;
+	}
+
+	ip_val = temp.s_addr;
+	return add_neighbor_ip(ip_val);
+}
+
+/* 
+ * @purpose:
+ * 
+ * @param:
+ *
+ * @return:	
+ *
+ */
+/* TODO: Neighbor has contacted us to be their neighbor
+ * 		 This should be the start of a new thread.
+ *
+ *
+ *
+ */
+bool PO_Node::add_neighbor_to_server()
+{
+	return false;
+}
+
+/* 
+ * @purpose:
+ * 
+ * @param:
+ *
+ * @return:	
+ *
+ */
+// TODO: Test this method
+// Add and contact the new neighbor.
+bool PO_Node::add_server_to_neighbor(unsigned long neighbor_ip)
+{
+	// keep track of this thread's idx
+	int sock_fd; // temporary, move into class variable
+	// super node has provided a neighbor to connect to
+	// add the ip locally
+	add_neighbor_ip(neighbor_ip); // have this return idx
+	// create client socket
+	// sock_fd = (this->server_neighbor_sock).setup_client_socket();
+
+	// send init message to connect with neighbor server
+
+
+	// spawn thread to handle connection
+	return false;
+}
+
+/* 
+ * @purpose:
+ * 
+ * @param:
+ *
+ * @return:	
+ *
+ */
+// internal: add neighbor to list provided binary ip
+bool PO_Node::add_neighbor_ip(unsigned long ip_val)
 {
 	bool success = false;
 	bool ip_exists = false;
@@ -106,16 +245,6 @@ bool PO_Node::add_neighbor(char *ip)
 	unsigned int filled_idx = 0;
 	unsigned int avail_idx;
 
-	unsigned long ip_val;
-	struct in_addr temp;
-
-	if(inet_aton(ip, &temp) == 0)
-	{
-		syslog(LOG_NOTICE, "[po_node] Invalid ip address string provided.");
-		return success;
-	}
-
-	ip_val = temp.s_addr;
 	// find last available slot and if ip already exists
 	while(filled_idx < MAX_NEIGHBORS)
 	{	
@@ -143,7 +272,7 @@ bool PO_Node::add_neighbor(char *ip)
 	if(ip_exists)
 	{
 		// TODO: Does syslog have a stack smash vulnerability
-		syslog(LOG_NOTICE, "[po_node] Attempted to add an existing neighbor ip (%s).", ip);
+		syslog(LOG_NOTICE, "[po_node] Attempted to add an existing neighbor ip.");
 	}
 	else if(!success)
 	{
@@ -152,13 +281,18 @@ bool PO_Node::add_neighbor(char *ip)
 	return success;
 }
 
+/* 
+ * @purpose:
+ * 
+ * @param:
+ *
+ * @return:	
+ *
+ */
 // TODO: Change parameter to make it secure from possible overflows
-bool PO_Node::remove_neighbor(char *ip)
+// remove neighbor provided string ip
+bool PO_Node::remove_neighbor_ip(char *ip)
 {
-	bool success = false;
-	
-	unsigned int filled_idx = 0;
-
 	unsigned long ip_check;
 	struct in_addr temp;
 
@@ -166,10 +300,28 @@ bool PO_Node::remove_neighbor(char *ip)
 	if(inet_aton(ip, &temp) == 0)
 	{
 		syslog(LOG_NOTICE, "[po_node] Invalid ip address string provided.");
-		return success;
+		return false;
 	}
 
 	ip_check = temp.s_addr;
+	return remove_neighbor_ip(ip_check);
+}
+
+/* private
+ * @purpose:
+ * 
+ * @param:
+ *
+ * @return:	status of operation
+ *
+ */
+// internal: remove neighbor from list provided binary ip
+bool PO_Node::remove_neighbor_ip(unsigned long ip_check)
+{
+	bool success = false;
+	
+	unsigned int filled_idx = 0;
+
 	// iterate over the neighbors, and remove the first matching ip
 	while(filled_idx < MAX_NEIGHBORS)
 	{
@@ -191,7 +343,7 @@ bool PO_Node::remove_neighbor(char *ip)
 	if(!success)
 	{
 		// TODO: Does syslog have a stack smash vulnerability
-		syslog(LOG_NOTICE, "[po_node] Can't delete nonexistent neighbor ip (%s).", ip);
+		syslog(LOG_NOTICE, "[po_node] Can't delete nonexistent neighbor ip.");
 	}
 	return success;
 }

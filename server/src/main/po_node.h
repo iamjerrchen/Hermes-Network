@@ -15,17 +15,23 @@ private:
 
 	// private variables
 	unsigned long neighbor_ips[MAX_NEIGHBORS];
-	std::thread *neighbor_threads[MAX_NEIGHBORS];
+	// std::thread *neighbor_threads[MAX_NEIGHBORS];
 	bool filled[MAX_NEIGHBORS]; // determines which neighbors are filled
+	// int neighbor_sock_fd[MAX_NEIGHBORS];
 	
 	Socket *client_connection;
-	Socket neighbor_listener; // binds to a specified port, listens for connections
-	// Socket node_clients[MAX_NEIGHBORS];
+	Socket neighbor_server_sock; // binds to a specified port, listens for connections
+	Socket server_neighbor_sock; // Resuable: creates fd for communication
+
 
 	// private functions
 	void server_listen();
 	bool spawn_server_listener(unsigned int thread_idx);
 	bool spawn_client_listener();
+
+	bool add_neighbor_ip(unsigned long ip_val);
+	// TODO: remove_neighbor_ip() by internal idx
+	bool remove_neighbor_ip(unsigned long ip_check);
 
 public:
 
@@ -36,8 +42,10 @@ public:
 	PO_Node(const PO_Node &other);
 	PO_Node & operator=(const PO_Node &rhs);
 
-	bool add_neighbor(char *ip);
-	bool remove_neighbor(char *ip);
+	bool add_neighbor_to_server();
+	bool add_server_to_neighbor(unsigned long neighbor_ip);
+	bool add_neighbor_ip(char *ip); // wrapper
+	bool remove_neighbor_ip(char *ip);
 
 };
 

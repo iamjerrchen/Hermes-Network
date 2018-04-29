@@ -94,7 +94,6 @@ bool Socket::setup_server_socket(int port)
  */
 int Socket::setup_client_socket(int port, char* ip)
 {
-	int success = 0;
 	this->port = port;
 	if(create())
 	{
