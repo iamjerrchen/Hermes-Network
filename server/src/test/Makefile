@@ -10,7 +10,7 @@ BIN_DIR=./../../../bin/test/$@ $<
 
 
 ### client ###
-CLIENT_TEST_SRC=./client.cpp
+CLIENT_TEST_SRC=./client_test.cpp
 CLIENT_TEST_INC=./../main/socket.cpp
 
 client_test: $(CLIENT_TEST_SRC)
