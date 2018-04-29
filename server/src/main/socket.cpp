@@ -14,6 +14,14 @@
 #include <syslog.h>
 #include <errno.h>
 
+/* public
+ * @purpose:
+ * 
+ * @param:
+ *
+ * @return:	
+ *
+ */
 Socket::Socket()
 {
 	memset(&(this->address), '0', sizeof(this->address));
@@ -23,9 +31,18 @@ Socket::Socket()
 	this->max_queued_conn = 5;
 }
 
+/* public
+ * @purpose:
+ * 
+ * @param:
+ *
+ * @return:	
+ *
+ */
 Socket::~Socket()
 {
 	/* TODO: Properly close socketfd.
+	 * Value inputed to shutdown:
 	 * 0: stop receiving data
 	 * 1: stop transmissing data
 	 * 2: stop receiving and transmitting
@@ -33,10 +50,22 @@ Socket::~Socket()
 	shutdown(this->socket_fd, 2);
 }
 
+/* public
+ * @purpose:
+ * 		This method is used by server sockets to setup the socket
+ *		with proper configurations and a specific port to listen on.
+ *		This is a wrapper that handles all the overhead prior to
+ *		accepting a connection from a client.
+ * @param:
+ *		port | specified port to bind server socket
+ * @return:	status of operation
+ *		true: properly executed operation
+ *		false: unable to setup the socket
+ */
 /* Server TCP socket methods */
 bool Socket::setup_server_socket(int port)
 {
-	int success = 0;
+	bool success = false;
 	this->port = port;
 	if(create())
 	{
@@ -44,14 +73,25 @@ bool Socket::setup_server_socket(int port)
 		{
 			if(listen_port())
 			{
-				success = 1;
+				success = true;
 			}
 		}
 	}
 	return success;
 }
 
-// port = port to connect to
+/* public
+ * @purpose:
+ * 		This method is used by client sockets to setup the socket
+ *		with proper configurations and a specified port and ip to
+ *		connect to a server that is listening on the port.
+ * @param:
+ *		port | specified port server is listening on
+ *		ip | specified ip of the server
+ * @return:	socket file descriptor
+ *		< 0: Unable to setup client socket and connect
+ *		> 0: Valid socket fd for use.
+ */
 int Socket::setup_client_socket(int port, char* ip)
 {
 	int success = 0;
@@ -69,7 +109,16 @@ int Socket::setup_client_socket(int port, char* ip)
 	return -1;
 }
 
-// used by client to connect to server address, similar to accept
+/* public
+ * @purpose:
+ * 		This method is used by client sockets to attempt to connect
+ *		to the configured address.
+ * @param:
+ *		None
+ * @return: status of operation
+ *		true: properly completed operation
+ *		false: unable to connect to target address
+ */
 bool Socket::connect_server()
 {
 	if(connect(this->socket_fd, (struct sockaddr *)&(this->address), sizeof(this->address)) < 0)
@@ -80,7 +129,18 @@ bool Socket::connect_server()
 	return true;
 }
 
-// used by client to create server address
+/* public
+ * @purpose:
+ * 		This method is used by client sockets to configure
+ *		the socket to connect to a specific ip that is listening
+ *		on the specified port.
+ * @param:
+ *		port | specified port to connect to
+ *		ip | specified ip to connect to
+ * @return: status of operation	
+ *		true: properly completed operation
+ *		false: unable to configure target address
+ */
 bool Socket::configure_address(int port, char* ip)
 {
 	(this->address).sin_family = AF_INET;
@@ -93,7 +153,16 @@ bool Socket::configure_address(int port, char* ip)
 	return true;
 }
 
-// used by both client and server
+/* public
+ * @purpose:
+ *		This method is used by server and client sockets. Generates
+ *		a file descriptor stored in the object. 
+ * @param:
+ *		None
+ * @return:	status of operation
+ *		true: properly completed operation
+ *		system exit: unable to create socket file descriptor
+ */
 bool Socket::create()
 {
 	// create socket file descriptor
@@ -104,10 +173,22 @@ bool Socket::create()
 		exit(EXIT_FAILURE);
 	}
 
-	return 1;
+	return true;
 }
 
-// used by server to bind to a port
+/* public
+ * @purpose:
+ * 		This method is used by server sockets that are binded
+ *		to a port. Sets the socket option/flags and attaches the
+ *		object to a specified port. Socket is currently set to
+ *		accept connections on the specified port from any address.
+ * @param:
+ *		port | port to attach to.
+ * @return:	status of operation
+ *		true: properly completed operation
+ *		false: failed to attach to port
+ *		system exit: unable to set socket operations
+ */
 bool Socket::attach(int port)
 {
 	int opt = 1;
@@ -130,13 +211,23 @@ bool Socket::attach(int port)
 	{
 		// Failure to bind to port should return with 0 instead of exit.
 		syslog(LOG_ERR, "[socket] Failed to bind to port %d: %s", port, strerror(errno));
-		return 0;
+		return false;
 	}
 
-	return 1;
+	return true;
 }
 
-// used by server to listen on a port
+/* public
+ * @purpose:
+ * 		This method is used by server sockets that are binded
+ *		to a port. Listens on a port readying itself to accept
+ *		connections.
+ * @param:
+ *		None
+ * @return:	status of operation
+ *		true: properly completed operation
+ *		system exit: unable to listen
+ */
 bool Socket::listen_port()
 {
 	int ret_check;
@@ -148,10 +239,21 @@ bool Socket::listen_port()
 		exit(EXIT_FAILURE);
 	}
 
-	return 1;
+	return true;
 }
 
-// used by server to accept incoming connections
+/* public
+ * @purpose:
+ * 		This method is used by server sockets that are binded
+ *		to a port. Accepts a client's request to connect and 
+ *		produces a socket file descriptor that will is used to
+ *		continue communications and return messages.
+ * @param:
+ *		None
+ * @return: socket file descriptor
+ *		< 0: Unable to accept connection
+ *		> 0: Valid socket fd for use.
+ */
 int Socket::accept_conn()
 {
 	int sock, addrlen;

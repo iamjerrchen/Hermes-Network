@@ -10,7 +10,7 @@ private:
 
 	struct sockaddr_in address;
 	int port; // definable by caller
-	int socket_fd; // -1 : undefined
+	int socket_fd; // -1: undefined
 
 	int max_queued_conn; // maximum queued connections
 
