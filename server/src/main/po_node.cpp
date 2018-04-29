@@ -109,20 +109,7 @@ PO_Node & PO_Node::operator=(const PO_Node &rhs)
  * @purpose:
  * 
  * @param:
- *
- * @return:	
- *
- */
-void PO_Node::server_listen()
-{
-
-}
-
-/* 
- * @purpose:
- * 
- * @param:
- *
+ *		thread_idx | 
  * @return:	
  *
  */
@@ -165,38 +152,13 @@ bool PO_Node::spawn_client_listener()
  * @return:	
  *
  */
-// TODO: Change parameter to make it secure from possible overflows
-// remove neighbor provided string ip
-bool PO_Node::add_neighbor_ip(char *ip)
-{
-	unsigned long ip_val;
-	struct in_addr temp;
-
-	if(inet_aton(ip, &temp) == 0)
-	{
-		syslog(LOG_NOTICE, "[po_node] Invalid ip address string provided.");
-		return false;
-	}
-
-	ip_val = temp.s_addr;
-	return add_neighbor_ip(ip_val);
-}
-
-/* 
- * @purpose:
- * 
- * @param:
- *
- * @return:	
- *
- */
 /* TODO: Neighbor has contacted us to be their neighbor
  * 		 This should be the start of a new thread.
  *
  *
  *
  */
-bool PO_Node::add_neighbor_to_server()
+bool PO_Node::add_neighbor_to_server_conn()
 {
 	return false;
 }
@@ -207,11 +169,11 @@ bool PO_Node::add_neighbor_to_server()
  * @param:
  *
  * @return:	
- *
+ *		
  */
 // TODO: Test this method
 // Add and contact the new neighbor.
-bool PO_Node::add_server_to_neighbor(unsigned long neighbor_ip)
+bool PO_Node::add_server_to_neighbor_conn(unsigned long neighbor_ip)
 {
 	// keep track of this thread's idx
 	int sock_fd; // temporary, move into class variable
@@ -230,11 +192,37 @@ bool PO_Node::add_server_to_neighbor(unsigned long neighbor_ip)
 
 /* 
  * @purpose:
- * 
+ * 		Adds the provided ip in string form to neighbor_ips
  * @param:
- *
+ *		ip | ip in the form of a string, ex. "127.0.0.1"
  * @return:	
- *
+ *		true: properly executed operation
+ *		false: failed to add neighbor
+ */
+// TODO: Change parameter to make it secure from possible overflows
+bool PO_Node::add_neighbor_ip(char *ip)
+{
+	unsigned long ip_val;
+	struct in_addr temp;
+
+	if(inet_aton(ip, &temp) == 0)
+	{
+		syslog(LOG_NOTICE, "[po_node] Invalid ip address string provided.");
+		return false;
+	}
+
+	ip_val = temp.s_addr;
+	return add_neighbor_ip(ip_val);
+}
+
+/* private
+ * @purpose:
+ * 		Adds provided ip in byte form to class neighbor_ips
+ * @param:
+ *		ip_val | provided ip in byte form
+ * @return:	status of operation
+ *		true: properly executed operation
+ *		false: failed to add neighbor ip
  */
 // internal: add neighbor to list provided binary ip
 bool PO_Node::add_neighbor_ip(unsigned long ip_val)
@@ -281,16 +269,16 @@ bool PO_Node::add_neighbor_ip(unsigned long ip_val)
 	return success;
 }
 
-/* 
+/* public
  * @purpose:
- * 
+ * 		Removes specified ip in string form from class neighbor_ips
  * @param:
- *
- * @return:	
- *
+ *		ip | ip in string form
+ * @return:	status of operation
+ *		true: successfully removed neighbor
+ *		false: invalid ip provided or nonexistent ip
  */
 // TODO: Change parameter to make it secure from possible overflows
-// remove neighbor provided string ip
 bool PO_Node::remove_neighbor_ip(char *ip)
 {
 	unsigned long ip_check;
@@ -309,13 +297,13 @@ bool PO_Node::remove_neighbor_ip(char *ip)
 
 /* private
  * @purpose:
- * 
+ * 		Removes specified ip in byte order form from class neighbor_ips
  * @param:
- *
+ *		ip_check | ip in byte order form
  * @return:	status of operation
- *
+ *		true: successfully executed operation
+ *		false: failed to remove nonexistent ip
  */
-// internal: remove neighbor from list provided binary ip
 bool PO_Node::remove_neighbor_ip(unsigned long ip_check)
 {
 	bool success = false;

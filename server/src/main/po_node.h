@@ -25,7 +25,6 @@ private:
 
 
 	// private functions
-	void server_listen();
 	bool spawn_server_listener(unsigned int thread_idx);
 	bool spawn_client_listener();
 
@@ -42,8 +41,8 @@ public:
 	PO_Node(const PO_Node &other);
 	PO_Node & operator=(const PO_Node &rhs);
 
-	bool add_neighbor_to_server();
-	bool add_server_to_neighbor(unsigned long neighbor_ip);
+	bool add_neighbor_to_server_conn();
+	bool add_server_to_neighbor_conn(unsigned long neighbor_ip);
 	bool add_neighbor_ip(char *ip); // wrapper
 	bool remove_neighbor_ip(char *ip);
 
