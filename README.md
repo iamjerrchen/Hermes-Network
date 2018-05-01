@@ -1,5 +1,4 @@
 # p2p_messaging_network
-Jerry the Great
 
 ## Project Proposal
 We intend to work on a peer to peer messaging network. Every user will run their own
