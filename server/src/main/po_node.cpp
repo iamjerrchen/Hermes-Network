@@ -130,6 +130,7 @@ bool PO_Node::spawn_server_listener(unsigned int thread_idx)
  * @return:	
  *
  */
+//FIXME
 bool PO_Node::spawn_client_listener()
 {
 	client_connection = new Socket();
