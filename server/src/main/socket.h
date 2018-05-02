@@ -14,18 +14,6 @@ private:
 
 	int max_queued_conn; // maximum queued connections
 
-public:
-
-	Socket();
-	~Socket();
-
-	// Prepare socket to accept connections
-	bool setup_server_socket(int port);
-	// Accept incoming connection
-	int accept_conn();
-	// Prepare socket to initiate connection
-	int setup_client_socket(int port, char* ip);
-
 	// connect to the target address
 	bool connect_server();
 	// configure class address
@@ -36,6 +24,20 @@ public:
 	bool attach(int port);
 	// Listen on the socket
 	bool listen_port();
+
+public:
+
+	Socket();
+	~Socket();
+
+	int get_socket_fd();
+
+	// Prepare socket to accept connections
+	bool setup_server_socket(int port);
+	// Accept incoming connection
+	int accept_conn();
+	// Prepare socket to initiate connection
+	int setup_client_socket(int port, char* ip);
 
 };
 

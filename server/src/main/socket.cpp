@@ -50,6 +50,11 @@ Socket::~Socket()
 	shutdown(this->socket_fd, 2);
 }
 
+int Socket::get_socket_fd()
+{
+	return socket_fd;
+}
+
 /* public
  * @purpose:
  * 		This method is used by server sockets to setup the socket
