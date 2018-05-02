@@ -16,7 +16,7 @@
 
 int main(int argc, const char *argv[])
 {
-	global_data* data;
+	global_data data;
 	int new_socket, valread;
 
 	char buffer[1024] = {0};
@@ -35,7 +35,7 @@ int main(int argc, const char *argv[])
 			std::cout << "Accepted connection" << std::endl;
 		}
 		std::string ip;
-		start_neighbor_to_server_conn(ip, new_socket, data);
+		start_neighbor_to_server_conn(ip, new_socket, &data);
 
 		// valread = read(new_socket, buffer, 1024);
 		// printf("%s\n", buffer);

@@ -22,14 +22,19 @@
  */
 void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* data)
 {
-	data->num_connections++;
+	// data->num_connections++;
 	Connection *stream = new Connection(sock_fd, ip, data);
 
 
+	// TODO: Spawn receive message and send message thread
+	// listen for messages and send messages simultaneously
 	while(1) // change to 1
 	{
-	stream->receive_message();
-		// listen for messages and send messages simultaneously
+		if(stream->receive_message())
+		{
+			std::cout << "Sending message back" << std::endl;
+			stream->send_message();
+		}
 	}
 
 
@@ -46,7 +51,7 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
  */
  bool start_server_to_neighbor_conn(std::string ip, global_data* data)
  {
-	data->num_connections++;
+	// data->num_connections++;
 
  	int sock_fd;
  	Socket client_sock;
@@ -60,6 +65,11 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
 
  	// send initialization message
  	stream->greet_neighbor();
+ 	std::cout << "Greeting sent" << std::endl;
+ 	while(!stream->receive_message())
+ 	{
+ 		std::cout << "Waiting for message" << std::endl;
+ 	}
 
  	while(0) // change to 1
  	{

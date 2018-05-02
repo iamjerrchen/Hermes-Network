@@ -19,9 +19,9 @@
  
 int main(int argc, const char *argv[])
 {
-    global_data* thing;
+    global_data thing; //= new global_data();
     std::string ip = "127.0.0.1";
-    start_server_to_neighbor_conn(ip, thing);
+    start_server_to_neighbor_conn(ip, &thing);
 
 
     // int sock, valread;
