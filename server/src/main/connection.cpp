@@ -9,14 +9,6 @@ Connection::Connection(int fd, std::string ip, global_data * data)
     this->data = data;
 }
 
-Connection::Connection(int fd, global_data * data)
-{
-    // create an fd from the socket object
-    this->fd = fd;
-    this->ip = "";
-    this->data = data;
-}
-
 // send a message to intiate neighbor
 bool Connection::greet_neighbor()
 {
