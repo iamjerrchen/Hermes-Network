@@ -5,7 +5,7 @@
 
 ### Flags used for compilation ###
 CPPC=g++
-CPPFLAGS=-Wall -fno-builtin -fno-stack-protector -std=c++11
+CPPFLAGS=-Wall -fno-builtin -fno-stack-protector -std=c++17
 BIN_DIR=./../../../bin/test/$@ $<
 
 

@@ -3,6 +3,7 @@
  *	This test is paired with the client test.
  */
 
+#include "../main/global_data.h"
 #include "../main/socket.h"
 #include "../main/po_node.h"
 #include "../main/connection.h"
@@ -14,6 +15,7 @@
 
 int main(int argc, const char *argv[])
 {
+	global_data* data;
 	int new_socket, valread;
 
 	char buffer[1024] = {0};
@@ -28,8 +30,8 @@ int main(int argc, const char *argv[])
 	while(1)
 	{
 		new_socket = s.accept_conn();
-		string ip;
-		start_neighbor_to_server_conn(ip, new_socket);
+		std::string ip;
+		start_neighbor_to_server_conn(ip, new_socket, data);
 
 		// valread = read(new_socket, buffer, 1024);
 		// printf("%s\n", buffer);

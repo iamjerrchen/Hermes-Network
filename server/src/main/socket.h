@@ -17,7 +17,7 @@ private:
 	// connect to the target address
 	bool connect_server();
 	// configure class address
-	bool configure_address(int port, char* ip);
+	bool configure_address(int port, const char* ip);
 	// create the socket
 	bool create();
 	// Attach the socket to a port

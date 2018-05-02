@@ -1,5 +1,6 @@
 #ifndef GLOBAL_DATA_H_
 #define GLOBAL_DATA_H_
+
 #include <queue>
 #include <map>
 #include <string>
@@ -7,9 +8,10 @@
 #include <mutex>
 
 struct global_data {
-	map<string,queue> *incoming_messages;
-	map<string,queue> *outgoing_messages;
-	mutex in_lock;
-	mutex out_lock;
+	//std::map<std::string, std::queue> *incoming_messages;
+	//std::map<std::string, std::queue> *outgoing_messages;
+	//std::mutex in_lock;
+	//std::mutex out_lock;
 };
+
 #endif

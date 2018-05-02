@@ -1,5 +1,6 @@
 // Client side C/C++ program to demonstrate Socket programming
 
+#include "../main/global_data.h"
 #include "../main/socket.h"
 #include "../main/po_node.h"
 #include "../main/connection.h"
@@ -18,8 +19,9 @@
  
 int main(int argc, const char *argv[])
 {
-
-    start_server_to_neighbor_conn(argv[1]);
+    global_data* thing;
+    std::string ip = "127.0.0.1";
+    start_server_to_neighbor_conn(ip, thing);
 
 
     // int sock, valread;
