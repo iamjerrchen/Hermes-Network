@@ -4,13 +4,15 @@
  */
 
 #include "../main/socket.h"
+#include "../main/po_node.h"
+#include "../main/connection.h"
 
 #include <stdio.h>
 #include <unistd.h> // read()
 #include <string.h>
 #include <syslog.h>
 
-int main()
+int main(int argc, const char *argv[])
 {
 	int new_socket, valread;
 
@@ -20,16 +22,19 @@ int main()
 	openlog("server_test", LOG_PID, LOG_INFO);
 
 	Socket s;
-	s.setup_server_socket(31337);
+	s.setup_server_socket(SERVER_PORT);
 
 	// Continually listen on the port and accept connections.
 	while(1)
 	{
 		new_socket = s.accept_conn();
-		valread = read(new_socket, buffer, 1024);
-		printf("%s\n", buffer);
-		send(new_socket, hello, strlen(hello), 0);
-		printf("Hello message sent\n");
+		string ip;
+		start_neighbor_to_server_conn(ip, new_socket);
+
+		// valread = read(new_socket, buffer, 1024);
+		// printf("%s\n", buffer);
+		// send(new_socket, hello, strlen(hello), 0);
+		// printf("Hello message sent\n");
 	}
 
 	closelog();

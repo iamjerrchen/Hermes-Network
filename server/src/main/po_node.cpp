@@ -49,7 +49,7 @@ bool spawn_client_listener()
  * @return:	
  *		
  */
-void start_neighbor_to_server_conn(string ip, int sock_fd)
+void start_neighbor_to_server_conn(std::string ip, int sock_fd)
 {
 	Connection* stream = new Connection(sock_fd, ip.c_str(), &global_data);
 
@@ -72,7 +72,7 @@ void start_neighbor_to_server_conn(string ip, int sock_fd)
  * @return:	
  *		
  */
- bool start_server_to_neighbor_conn(string ip)
+ bool start_server_to_neighbor_conn(std::string ip)
  {
  	int sock_fd;
  	Socket client_sock;
