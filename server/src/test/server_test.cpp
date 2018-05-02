@@ -12,6 +12,7 @@
 #include <unistd.h> // read()
 #include <string.h>
 #include <syslog.h>
+#include <iostream>
 
 int main(int argc, const char *argv[])
 {
@@ -27,9 +28,12 @@ int main(int argc, const char *argv[])
 	s.setup_server_socket(SERVER_PORT);
 
 	// Continually listen on the port and accept connections.
-	while(1)
-	{
-		new_socket = s.accept_conn();
+	// while(1)
+	// {
+		if(0 < (new_socket = s.accept_conn()))
+		{
+			std::cout << "Accepted connection" << std::endl;
+		}
 		std::string ip;
 		start_neighbor_to_server_conn(ip, new_socket, data);
 
@@ -37,7 +41,7 @@ int main(int argc, const char *argv[])
 		// printf("%s\n", buffer);
 		// send(new_socket, hello, strlen(hello), 0);
 		// printf("Hello message sent\n");
-	}
+	// }
 
 	closelog();
 	return 0;

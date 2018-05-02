@@ -10,6 +10,7 @@
 #include <string.h>
 #include <syslog.h>
 #include <errno.h>
+#include <iostream>
 
 /* 
  * @purpose:
@@ -46,7 +47,6 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
  {
  	int sock_fd;
  	Socket client_sock;
-
  	if((sock_fd = client_sock.setup_client_socket(SERVER_PORT, ip.c_str())) < 0)
  	{	// unable to create client
  		syslog(LOG_NOTICE, "[po_node] Unable to connect to the neighbor ip (%s)", ip);
