@@ -28,7 +28,6 @@ private:
 public:
 
 	Socket();
-	~Socket();
 
 	int get_socket_fd();
 
@@ -37,7 +36,7 @@ public:
 	// Accept incoming connection
 	int accept_conn();
 	// Prepare socket to initiate connection
-	int setup_client_socket(int port, char* ip);
+	int setup_client_socket(int port, const char* ip);
 
 };
 
