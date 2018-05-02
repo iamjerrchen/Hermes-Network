@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "global_data.h"
+#include "socket.h"
 
-using std;
 
 int main(int argc, char * argv[]) {
 	if (argc > 4)
@@ -10,8 +10,8 @@ int main(int argc, char * argv[]) {
 	int num_connections = argc - 1;
 
 	global_data globals;
-	globals.incoming_messages = new map<string,queue>();
-	globals.outgoing_messages = new map<string,queue>();
+	globals.incoming_messages = new std::map<std::string,std::queue<std::string>>();
+	globals.outgoing_messages = new std::map<std::string,std::queue<std::string>>();
 
 	// Create client connection
 	
@@ -22,7 +22,7 @@ int main(int argc, char * argv[]) {
 	}
 	
 	// create server socket
-	Socket server_listener = new Socket();
+	Socket server_listener;
 	while (true) {
 		int fd = -1;
 		// if number of connections < 3, have server accept

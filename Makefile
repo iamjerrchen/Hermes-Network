@@ -5,8 +5,8 @@
 
 ### Flags used for compilation ###
 CPPC=g++
-CPPFLAGS=-Wall -fno-builtin -fno-stack-protector
-BIN_DIR=./bin/proj/$@ $<
+CPPFLAGS=-Wall -fno-builtin -fno-stack-protector -std=c++17
+BIN_DIR=./bin/main/p2p
 
 
 ### server test ###
@@ -19,11 +19,14 @@ BIN_DIR=./bin/proj/$@ $<
 
 
 ### all ###
-# all:
+MAIN_INC=./server/src/main/*.cpp
+all:
+	$(CPPC) $(CPPFLAGS) $(MAIN_INC) -o $(BIN_DIR)
+	 	
 
 
 ### cleanup ###
 .PHONY: clean
 clean:
-	rm -rf ./bin/proj/*
+	rm -rf ./bin/main/*
 
