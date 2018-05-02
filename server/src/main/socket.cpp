@@ -31,25 +31,6 @@ Socket::Socket()
 	this->max_queued_conn = 5;
 }
 
-/* public
- * @purpose:
- * 
- * @param:
- *
- * @return:	
- *
- */
-Socket::~Socket()
-{
-	/* TODO: Properly close socketfd.
-	 * Value inputed to shutdown:
-	 * 0: stop receiving data
-	 * 1: stop transmissing data
-	 * 2: stop receiving and transmitting
-	 */
-	shutdown(this->socket_fd, 2);
-}
-
 int Socket::get_socket_fd()
 {
 	return socket_fd;
@@ -97,7 +78,7 @@ bool Socket::setup_server_socket(int port)
  *		< 0: Unable to setup client socket and connect
  *		> 0: Valid socket fd for use.
  */
-int Socket::setup_client_socket(int port, char* ip)
+int Socket::setup_client_socket(int port, const char* ip)
 {
 	this->port = port;
 	if(create())
@@ -145,7 +126,7 @@ bool Socket::connect_server()
  *		true: properly completed operation
  *		false: unable to configure target address
  */
-bool Socket::configure_address(int port, char* ip)
+bool Socket::configure_address(int port, const char* ip)
 {
 	(this->address).sin_family = AF_INET;
 	(this->address).sin_port = htons(port);
