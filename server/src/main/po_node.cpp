@@ -22,6 +22,7 @@
  */
 void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* data)
 {
+	data->num_connections++;
 	Connection *stream = new Connection(sock_fd, ip, data);
 
 	stream->receive_message();
@@ -45,6 +46,8 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
  */
  bool start_server_to_neighbor_conn(std::string ip, global_data* data)
  {
+	data->num_connections++;
+
  	int sock_fd;
  	Socket client_sock;
  	if((sock_fd = client_sock.setup_client_socket(SERVER_PORT, ip.c_str())) < 0)

@@ -36,6 +36,11 @@ int Socket::get_socket_fd()
 	return socket_fd;
 }
 
+char* Socket::get_most_recent_ip()
+{
+	return inet_ntoa(address.sin_addr);
+}
+
 /* public
  * @purpose:
  * 		This method is used by server sockets to setup the socket

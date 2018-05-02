@@ -21,7 +21,7 @@ BIN_DIR=./bin/main/p2p
 ### all ###
 MAIN_INC=./server/src/main/*.cpp
 all:
-	$(CPPC) $(CPPFLAGS) $(MAIN_INC) -o $(BIN_DIR)
+	$(CPPC) $(CPPFLAGS) $(MAIN_INC) -o $(BIN_DIR) -lpthread
 	 	
 
 

@@ -30,6 +30,7 @@ public:
 	Socket();
 
 	int get_socket_fd();
+	char* get_most_recent_ip();
 
 	// Prepare socket to accept connections
 	bool setup_server_socket(int port);
