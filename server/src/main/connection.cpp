@@ -21,6 +21,7 @@ bool Connection::receive_message()
 {
     char buffer[256];
     int n = read(this->fd, buffer, 255);
+    printf("Message received: %s", buffer);
     // TODO: error report if n<0
 }
 
