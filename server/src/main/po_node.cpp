@@ -25,10 +25,10 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
 	data->num_connections++;
 	Connection *stream = new Connection(sock_fd, ip, data);
 
-	stream->receive_message();
 
-	while(0) // change to 1
+	while(1) // change to 1
 	{
+	stream->receive_message();
 		// listen for messages and send messages simultaneously
 	}
 
@@ -66,5 +66,6 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
  		// listen for messages and send messages simultaneously
  	}
 
+ 	// close(sock_fd);
  	return true;
 }

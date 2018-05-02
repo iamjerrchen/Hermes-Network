@@ -20,8 +20,8 @@ bool Connection::greet_neighbor()
 bool Connection::receive_message()
 {
     char buffer[256];
-    int n = read(this->fd, buffer, 255);
-    printf("Message received: %s", buffer);
+    int n = recv(this->fd, buffer, 255, MSG_WAITALL);
+    printf("Message received: %s %d\n", buffer, n);
     // TODO: error report if n<0
 }
 
