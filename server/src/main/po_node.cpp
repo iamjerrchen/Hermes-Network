@@ -40,6 +40,7 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
 	}
 	Connection *stream = new Connection(sock_fd, ip, data);
 
+	std::cout<<"Initializing all threads with " << ip << std::endl;
 	std::thread handle_thread = std::thread(&Connection::handle_message, stream);
 	std::thread recv_thread = std::thread(&Connection::receive_message, stream);
 	std::thread send_thread = std::thread(&Connection::send_message, stream);
@@ -76,6 +77,7 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
 		data->num_connections++;
 	}
 
+	std::cout<<"Attempting to connect with " << ip << std::endl;
  	int sock_fd;
  	Socket client_sock;
  	if((sock_fd = client_sock.setup_client_socket(SERVER_PORT, ip.c_str())) < 0)
@@ -86,6 +88,7 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
 
  	Connection* stream = new Connection(sock_fd, ip, data);
 
+	std::cout<<"Greeting " << ip << std::endl;
  	// send initialization message
  	stream->greet_neighbor();
 
