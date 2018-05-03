@@ -1,5 +1,6 @@
 # p2p_messaging_network
 
+If you are looking for the final project report, read REPORT.md instead
 ## Project Proposal
 We intend to work on a peer to peer messaging network. Every user will run their own
 instance of an identical node, where they can send and receive messages. The messages will
