@@ -17,6 +17,8 @@ private:
     int fd; // file descriptor
     std::string ip; // ip address of other side of connection
     global_data * data; // pointer to global map of messages
+	std::queue<std::string> * local_incoming_msg;
+	std::queue<std::string> * local_outgoing_msg;
 
     int seek_divider(std::string message);
 
@@ -31,7 +33,7 @@ public:
     bool greet_neighbor();
     bool receive_message();
     bool send_message();
-    bool handle_message();
+    void handle_message();
 
 };
 

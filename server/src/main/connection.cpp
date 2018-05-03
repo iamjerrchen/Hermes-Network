@@ -15,6 +15,38 @@ Connection::Connection(int fd, std::string ip, global_data * data)
     this->fd = fd;
     this->ip = ip;
     this->data = data;
+	this->local_incoming_msg = new std::queue<std::string>();
+	this->local_outgoing_msg = new std::queue<std::string>();
+
+	// Initialize global maps for this IP
+	{
+		std::lock_guard<std::mutex> lock(data->in_lock);
+		if (data->incoming_messages->count(ip) == 0) {
+			data->incoming_messages->insert(std::pair<std::string, std::queue<std::string>*>(ip, new std::queue<std::string>()));
+		}
+	}
+	{
+		std::lock_guard<std::mutex> lock(data->out_lock);
+		if (data->outgoing_messages->count(ip) == 0) {
+			data->outgoing_messages->insert(std::pair<std::string, std::queue<std::string>*>(ip, new std::queue<std::string>()));
+		}
+	}
+}
+
+Connection::~Connection() {
+	// Remove local objects
+	delete local_incoming_msg;
+	delete local_outgoing_msg;
+
+	// Remove global objects
+	{
+		std::lock_guard<std::mutex> lock(data->in_lock);
+		delete data->incoming_messages->at(ip);
+	}
+	{
+		std::lock_guard<std::mutex> lock(data->out_lock);
+		delete data->outgoing_messages->at(ip);
+	}
 }
 
 // send a message to intiate neighbor
@@ -39,6 +71,7 @@ bool Connection::greet_neighbor()
     return true; // if sent otherwise false
 }
 
+// TODO: Should be a while loop
 // receive and handle messages
 bool Connection::receive_message()
 {
@@ -76,11 +109,12 @@ bool Connection::receive_message()
     	curr_len += recv_len;
     }
 
-    // TODO: Store message
-    std::cout << message << std::endl;
+	// Store message into local stack
+	local_incoming_msg->push(message);
     return status;
 }
 
+// TODO: Should be a while loop and threaded
 // send a message to neighbor
 bool Connection::send_message()
 {
@@ -89,10 +123,31 @@ bool Connection::send_message()
     return true;
 }
 
-// place message into global data structure
-bool Connection::handle_message()
+// Worker thread that updates the 2 queues
+void Connection::handle_message()
 {
-    return false;
+	while(1) {
+		// Check to update structures every 5 seconds
+		sleep(5);
+
+		// Push all local messages to the global map
+		if (!local_incoming_msg->empty()) {
+			std::lock_guard<std::mutex> lock(data->in_lock);
+			while (!local_incoming_msg->empty()) {
+				data->incoming_messages->at(ip)->push(local_incoming_msg->front());
+				local_incoming_msg->pop();
+			}
+		}
+
+		// Pull pending messages from the global map
+		{
+			std::lock_guard<std::mutex> lock(data->out_lock);
+			while (!data->outgoing_messages->at(ip)->empty()) {
+				local_outgoing_msg->push(data->outgoing_messages->at(ip)->front());
+				data->outgoing_messages->at(ip)->pop();
+			}
+		}
+	}
 }
 
 
