@@ -96,7 +96,7 @@ void start_client_conn(global_data * data)
 			printf("Nothing has been read\n");
 			write(sock_fd, "FAIL", 4);
 		} else {
-			std::string request = std::string(buf);
+			std::string request = std::string(buf).substr(0, request_length);
 			connection.process_request(sock_fd, request);
 		}
 

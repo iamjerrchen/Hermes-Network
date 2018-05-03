@@ -18,17 +18,17 @@ def main():
 
 	if args.method == "PULL":
 		sock.send("PULL")
-		resp = sock.recv(512)
+		resp = sock.recv(2048)
+		print resp
 		if resp == "FAIL":
 			print "Pull failed"
-		else:
-			num_msgs = int(resp[8:])
-			for _i in range(num_msgs):
-				single_msg = sock.recv(2048)
-				print single_msg
+		# TODO: Parse messages to print out nicely
+		# TODO: if queue is too big, make successive reads
+		# TODO: Ensure we have gotten all messages
 
 	elif args.method == "PUSH":
 		request_str = "PUSH " + "IP:" + args.to + " MSG:" + args.msg
+		print request_str
 		sock.send(request_str)
 		resp = sock.recv(2048)
 		print "Response %s" % (resp)

@@ -3,6 +3,7 @@
 #include "global_data.h"
 #include <iostream>
 #include <unistd.h>
+#include <sstream>
 
 class client_connection {
 	private:

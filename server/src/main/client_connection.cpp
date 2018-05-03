@@ -9,17 +9,13 @@ bool client_connection::process_push(std::string message) {
 		return false;
 	}
 
-	int end_of_ip = message.find_first_of(" ", 3);
-	if (end_of_ip < 0) {
+	int msg_tag_start = message.find_first_of(" ", 3) + 1;
+	if (msg_tag_start == 0 || message.substr(msg_tag_start, 4) != "MSG:") {
 		return false;
 	}
 
-	std::string dest_ip = message.substr(3, end_of_ip);
-
-	if (message.substr(end_of_ip + 1, end_of_ip + 5) != "MSG:") {
-		return false;
-	}
-	std::string message_contents = message.substr(end_of_ip + 5);
+	std::string dest_ip = message.substr(3, msg_tag_start - 4);
+	std::string message_contents = message.substr(msg_tag_start + 4);
 
 	{
 		std::lock_guard<std::mutex> lock(data->out_lock);
@@ -52,7 +48,11 @@ void client_connection::process_pull(int sock_fd) {
 	}
 
 	int count = local_message_queue.size();
-	std::string success_str = "SUCCESS " + count;
+
+	std::ostringstream string_stream;
+	string_stream << "SUCCESS " << count;
+	std::string success_str = string_stream.str();
+
 	write(sock_fd, success_str.c_str(), success_str.length());
 	while (!local_message_queue.empty()) {
 		std::string response = local_message_queue.front();

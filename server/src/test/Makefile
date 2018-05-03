@@ -43,6 +43,10 @@ PO_NODE_TEST_INC=./../main/po_node.cpp ./../main/socket.cpp
 po_node_test: $(PO_NODE_TEST_SRC)
 	$(CPPC) $(CPPFLAGS) $(PO_NODE_TEST_INC) -o $(BIN_DIR)
 
+CLIENT_CONN_TEST_SRC=./client_connection_test.cpp
+CLIENT_CONN_TEST_INC=./../main/po_node.cpp ./../main/socket.cpp ./../main/client_connection.cpp ./../main/connection.cpp
+client_conn_test: $(CLIENT_CONN_TEST_SRC)
+	$(CPPC) $(CPPFLAGS) $(CLIENT_CONN_TEST_INC) -o $(BIN_DIR) -lpthread
 
 ### cleanup ###
 .PHONY: clean

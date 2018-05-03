@@ -18,6 +18,7 @@ int main(int argc, char * argv[]) {
 	// Create client connection
 	printf("Creating client...\n");
 	std::thread client_conn(start_client_conn, &globals);
+	client_conn.detach();
 	
 	// Create node connections
 	printf("Connecting to nodes...\n");
