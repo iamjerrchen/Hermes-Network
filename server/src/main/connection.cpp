@@ -166,6 +166,7 @@ void Connection::send_message()
 // Worker thread that updates the 2 queues
 void Connection::handle_message()
 {
+	std::cout << "Starting handle message thread" << std::endl;
 	while(1) {
 		// Check to update structures every 5 seconds
 		sleep(5);
