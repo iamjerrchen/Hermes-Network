@@ -19,10 +19,10 @@ On machine 2 at time t > 0:
 ```bin/main/p2p 192.168.1.10```
 
 To actually send messages run:
-```python client/src/main/client.py PUSH --to IP_ADDRESS --msg MESSAGE```
+```python client/main/client.py PUSH --to IP_ADDRESS --msg MESSAGE```
 
 To read your new messages run:
-```python client/src/main/client.py PULL```
+```python client/main/client.py PULL```
 
 ## Introduction
 We will be using the word Server and Node interchangeably.
@@ -74,13 +74,9 @@ There are several problems with using flood queries. First, they are slow and br
 ### Security Concerns
 The biggest security concern in our implementation is confidentiality of the data passed from the sending Node to the receiving Node. As it stands, there is no encryption used to protect the messages being passed along the network. That means that any intermediary node that passes on the message can read the exact message that the original sender has sent. The obvious fix to this is to have the original sending node to encrypt the message before it is passed on the the rest of the network in search for its receiver. However, there is overhead to this as there would have to be some key-sharing process that takes place between the sending and receiving Nodes before the messages are sent. This would introduce a more complex handshake. Another way to solve this is to agree on a encryption key outside of the network, like how a lot of similar networks do it.
 
-Another security concern is the integrity of the messages. As of right now, any intermediary Node can modify a message that it needs to pass along. This can be harmful because the receiver of the message can get something completely different than what was originally sent from the sender. To fix this, the same thing can be done as mentioned before. We would need to have the sender and receiver establish some 
-
-Ensure client_connection only connects with a process from the local machine
+Another security concern is the integrity of the messages. As of right now, any intermediary Node can modify a message that it needs to pass along. This can be harmful because the receiver of the message can get something completely different than what was originally sent from the sender. To fix this, the same thing can be done as mentioned before. We would need to have the sender and receiver establish some sort of hash of the message for example on an off network process. 
 
 ## What We Learned - Conclusion
 Writing decentralized systems are hard. The latest motivation for so many decentralized and distributed systems comes from a general lack of trust in larger corporations. Open source clients don’t mean anything if we don’t know what corporations do with the data we send them. But there was a reason the first type of architecture was around centralized systems. They are generally more efficient and easier to write. What we wrote works for 3 computers talking to each other. Much greater leaps would need to be taken in order to make it work for millions of people in a network.
 
 What we actually implemented is a way to communicate with up to 3 machines at once. If you know their IPs, you can establish a connection with them and send messages through the python client. We were unable to implement message forwarding or dynamically adding or removing nodes into the network. A message will go from local client to local server to neighbor server to neighbor client. All messages are held in a global queue in the server until the client asks for them. There, the messages are popped off the queue and the client prints out where the message came from and the contents of the message.
-
-
