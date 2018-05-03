@@ -32,8 +32,7 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
 	{
 		if(stream->receive_message())
 		{
-			std::cout << "Sending message back" << std::endl;
-			stream->send_message();
+			// stream->send_message();
 		}
 	}
 
@@ -57,7 +56,7 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
  	Socket client_sock;
  	if((sock_fd = client_sock.setup_client_socket(SERVER_PORT, ip.c_str())) < 0)
  	{	// unable to create client
- 		syslog(LOG_NOTICE, "[po_node] Unable to connect to the neighbor ip (%s)", ip);
+ 		syslog(LOG_NOTICE, "[po_node] Unable to connect to the neighbor ip (%s)", ip.c_str());
  		return false;
  	}
 
@@ -65,12 +64,9 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
 
  	// send initialization message
  	stream->greet_neighbor();
- 	std::cout << "Greeting sent" << std::endl;
- 	while(!stream->receive_message())
- 	{
- 		std::cout << "Waiting for message" << std::endl;
- 	}
-
+ 	stream->receive_message(); // waits till message is received
+ 	
+ 	std::cout << "Message received" << std::endl;
  	while(0) // change to 1
  	{
  		// listen for messages and send messages simultaneously

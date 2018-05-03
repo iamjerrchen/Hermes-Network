@@ -11,7 +11,7 @@ BIN_DIR=./../../../bin/test/$@ $<
 
 ### client ###
 CLIENT_TEST_SRC=./client_test.cpp
-CLIENT_TEST_INC=./../main/socket.cpp ./../main/po_node.cpp ./../main/connection.cpp
+CLIENT_TEST_INC=./../main/socket.cpp ./../main/po_node.cpp ./../main/connection.cpp ./../main/client_connection.cpp
 
 client_test: $(CLIENT_TEST_SRC)
 	$(CPPC) $(CPPFLAGS) $(CLIENT_TEST_INC) -o $(BIN_DIR)
@@ -20,7 +20,7 @@ client_test: $(CLIENT_TEST_SRC)
 ### server test ###
 SERVER_TEST_SRC=./server_test.cpp
 # $(wildcard ./src/main/*.cpp) < optional
-SERVER_TEST_INC=./../main/socket.cpp ./../main/po_node.cpp ./../main/connection.cpp
+SERVER_TEST_INC=./../main/socket.cpp ./../main/po_node.cpp ./../main/connection.cpp ./../main/client_connection.cpp
 
 server_test: $(SERVER_TEST_SRC)
 	$(CPPC) $(CPPFLAGS) $(SERVER_TEST_INC) -o $(BIN_DIR)
