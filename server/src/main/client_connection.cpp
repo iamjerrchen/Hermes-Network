@@ -16,11 +16,14 @@ bool client_connection::process_push(std::string message) {
 
 	std::string dest_ip = message.substr(3, msg_tag_start - 4);
 	std::string message_contents = message.substr(msg_tag_start + 4);
+	
+	std::ostringstream stream;
+	stream << message_contents.length() << CODE_MSG_DIVIDER << STD_CODE << CODE_MSG_DIVIDER << message_contents;
 
 	{
 		std::lock_guard<std::mutex> lock(data->out_lock);
 		try {
-			data->outgoing_messages->at(dest_ip)->push(message_contents);
+			data->outgoing_messages->at(dest_ip)->push(stream.str());
 		} catch (std::out_of_range &e) {
 			std::queue<std::string> *msg_queue = new std::queue<std::string>();
 			msg_queue->push(message_contents);
@@ -32,6 +35,7 @@ bool client_connection::process_push(std::string message) {
 }
 
 void client_connection::process_pull(int sock_fd) {
+	int msg_start;
 	std::queue<std::string> local_message_queue = std::queue<std::string>();
 
 	{
@@ -40,8 +44,13 @@ void client_connection::process_pull(int sock_fd) {
 			std::string msg;
 			while (!it->second->empty()) {
 				msg = it->second->front();
+				msg_start = -1;
+				for (int i = 0; i < 2; i++) {
+					msg_start = msg.find_first_of(CODE_MSG_DIVIDER, msg_start + 1);
+				}
+
 				it->second->pop();
-				std::string resp_i = "IP: " + it->first + " MSG:" + msg;
+				std::string resp_i = "IP: " + it->first + " MSG:" + msg.substr(msg_start + 1);
 				local_message_queue.push(resp_i);
 			}
 		}
@@ -55,6 +64,7 @@ void client_connection::process_pull(int sock_fd) {
 
 	write(sock_fd, success_str.c_str(), success_str.length());
 	while (!local_message_queue.empty()) {
+		usleep(500000); // Half a second
 		std::string response = local_message_queue.front();
 		write(sock_fd, response.c_str(), response.length());
 		local_message_queue.pop();

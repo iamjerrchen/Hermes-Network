@@ -143,14 +143,6 @@ void Connection::send_message()
 			local_outgoing_msg->pop();
 		}
 
-		content_len = msg.length();
-		msg_header = std::to_string(content_len);
-		// FIXME: temporary hard code, in the future implement format message method
-		msg_header += CODE_MSG_DIVIDER;
-		msg_header += STD_CODE;
-		msg_header += CODE_MSG_DIVIDER;
-		msg = msg_header + msg;
-
 		// write message
 		// TODO: Longer messages
 		send_len = write(this->fd, msg.c_str(), msg.length());

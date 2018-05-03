@@ -22,6 +22,9 @@ def main():
 		print resp
 		if resp == "FAIL":
 			print "Pull failed"
+		num_msg = int(resp[8:])
+		for _i in range(num_msg):
+			print sock.recv(2048)
 		# TODO: Parse messages to print out nicely
 		# TODO: if queue is too big, make successive reads
 		# TODO: Ensure we have gotten all messages
