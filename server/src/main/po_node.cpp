@@ -23,21 +23,30 @@
  */
 void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* data)
 {
-	// data->num_connections++;
+	// With this implementation, its possible for a connection to be accepted followed by being immediately terminated
+	{
+		std::lock_guard<std::mutex> lock(data->conn_lock);
+		if (data->num_connections >= 3) {
+			close(sock_fd);
+			return;
+		}
+		data->num_connections++;
+	}
 	Connection *stream = new Connection(sock_fd, ip, data);
 
+	std::thread handle_thread = std::thread(stream->handle_message, stream);
+	std::thread recv_thread = std::thread(stream->receive_message, stream);
+	std::thread send_thread = std::thread(stream->send_message, stream);
 
-	// TODO: Spawn receive message and send message thread
-	// listen for messages and send messages simultaneously
-	// while(1) // change to 1
-	// {
-		if(stream->receive_message())
-		{
-			stream->send_message();
-		}
-	// }
+	handle_thread.join();
+	recv_thread.join();
+	send_thread.join();
 
-
+	close(sock_fd);
+	{
+		std::lock_guard<std::mutex> lock(data->conn_lock);
+		data->num_connections--;
+	}
 	return;
 }
 
@@ -52,7 +61,13 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
  */
  bool start_server_to_neighbor_conn(std::string ip, global_data* data)
  {
-	// data->num_connections++;
+	{
+		std::lock_guard<std::mutex> lock(data->conn_lock);
+		if (data->num_connections >= 3) {
+			return;
+		}
+		data->num_connections++;
+	}
 
  	int sock_fd;
  	Socket client_sock;
@@ -66,15 +81,20 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
 
  	// send initialization message
  	stream->greet_neighbor();
- 	stream->receive_message(); // waits till message is received
- 	
- 	std::cout << "Message received" << std::endl;
- 	while(0) // change to 1
- 	{
- 		// listen for messages and send messages simultaneously
- 	}
 
- 	// close(sock_fd);
+	std::thread handle_thread = std::thread(stream->handle_message, stream);
+	std::thread recv_thread = std::thread(stream->receive_message, stream);
+	std::thread send_thread = std::thread(stream->send_message, stream);
+
+	handle_thread.join();
+	recv_thread.join();
+	send_thread.join();
+
+ 	close(sock_fd);
+	{
+		std::lock_guard<std::mutex> lock(data->conn_lock);
+		data->num_connections--;
+	}
  	return true;
 }
 

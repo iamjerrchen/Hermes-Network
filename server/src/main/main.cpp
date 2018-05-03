@@ -27,18 +27,16 @@ int main(int argc, char * argv[]) {
 		std::thread new_conn(start_server_to_neighbor_conn, ip, &globals);
 		new_conn.detach();
 	}
-	
+
 	// create server socket
 	printf("Creating server...\n");
 	Socket server_listener;
 	server_listener.setup_server_socket(SERVER_PORT);
 	while (1) {
 		int sock_fd = -1;
-		if (globals.num_connections < 3) {
-			sock_fd = server_listener.accept_conn();
-			std::string ip(server_listener.get_most_recent_ip());
-			std::thread new_conn(start_neighbor_to_server_conn, ip, sock_fd, &globals);
-			new_conn.detach();
-		}
+		sock_fd = server_listener.accept_conn();
+		std::string ip(server_listener.get_most_recent_ip());
+		std::thread new_conn(start_neighbor_to_server_conn, ip, sock_fd, &globals);
+		new_conn.detach();
 	}
 }
