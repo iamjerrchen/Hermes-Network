@@ -85,6 +85,7 @@ void Connection::receive_message()
     char buffer[MAX_BUF_LEN];
 
 	while (1) {
+		msg_start = "";
 		// read a portion of the message for examination
 		recv_len = read(this->fd, buffer, MAX_BUF_LEN);
 		if (recv_len == 0) {
