@@ -16,12 +16,10 @@ int main(int argc, char * argv[]) {
 	globals.outgoing_messages = new std::map<std::string,std::queue<std::string>*>();
 
 	// Create client connection
-	printf("Creating client...\n");
 	std::thread client_conn(start_client_conn, &globals);
 	client_conn.detach();
 	
 	// Create node connections
-	printf("Connecting to nodes...\n");
 	for (int i = 1; i <= num_init_connections; i++) {
 		std::string ip(argv[i]);
 		std::thread new_conn(start_server_to_neighbor_conn, ip, &globals);
@@ -29,7 +27,7 @@ int main(int argc, char * argv[]) {
 	}
 
 	// create server socket
-	printf("Creating server...\n");
+	printf("Listening for more connections...\n");
 	Socket server_listener;
 	server_listener.setup_server_socket(SERVER_PORT);
 	while (1) {

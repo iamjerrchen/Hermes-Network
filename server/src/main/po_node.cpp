@@ -28,6 +28,7 @@
  */
 void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* data)
 {
+	std::cout<<"Starting connection thread with " << ip << std::endl;
 	// With this implementation, its possible for a connection to be accepted followed by being immediately terminated
 	{
 		std::lock_guard<std::mutex> lock(data->conn_lock);
@@ -66,6 +67,7 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
  */
  bool start_server_to_neighbor_conn(std::string ip, global_data* data)
  {
+	std::cout<<"Starting connection thread with " << ip << std::endl;
 	{
 		std::lock_guard<std::mutex> lock(data->conn_lock);
 		if (data->num_connections >= 3) {
