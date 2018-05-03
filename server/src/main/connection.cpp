@@ -126,7 +126,7 @@ void Connection::receive_message()
 void Connection::send_message()
 {
 	int content_len, send_len;
-	std::string msg;
+	std::string msg, msg_header;
 
 	while (1) {
 		{
@@ -141,7 +141,12 @@ void Connection::send_message()
 
 		// assuming popped message is in MSG_CODE|MESSAGE format
 		content_len = msg.length();
-		msg =  std::to_string(content_len) + msg;
+		msg_header = std::to_string(content_len);
+		// temporary hard code, in the future implement format message method
+		msg_header += CODE_MSG_DIVIDER;
+		msg_header += STD_CODE;
+		msg_header += CODE_MSG_DIVIDER;
+		msg = msg_header + msg;
 
 		// write message
 		send_len = write(this->fd, msg.c_str(), msg.length());
