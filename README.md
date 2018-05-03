@@ -1,6 +1,27 @@
 # p2p_messaging_network
 
 If you are looking for the final project report, read REPORT.md instead
+
+## How-To-Use
+Run ```make``` in the root directory of the project to build the standard application. 
+The node can be started by running ```bin/main/p2p```
+If this node is the first node to be started on the network, the above command will set it up fine.
+If there are existing nodes on the network already listening, as command line arguments pass up to 3 IP addresses of the nodes you want to connect to
+
+Example
+The following will connect to nodes together:
+On machine 1 with ip address 192.168.1.10 at time t=0:
+```bin/main/p2p```
+
+On machine 2 at time t > 0:
+```bin/main/p2p 192.168.1.10```
+
+To actually send messages run:
+```python client/main/client.py PUSH --to IP_ADDRESS --msg MESSAGE```
+
+To read your new messages run:
+```python client/main/client.py PULL```
+
 ## Project Proposal
 We intend to work on a peer to peer messaging network. Every user will run their own
 instance of an identical node, where they can send and receive messages. The messages will
@@ -21,7 +42,7 @@ a peer to peer environment. There are multiple complicated components in making 
 messaging system where each part has their own caveats. At the same time, testing will
 become more complicated as we will require several active intermediary nodes during testing.
 
-## Architecture
+## Architecture Concerns
 
 2 separate client and thread processes instead of a client and server thread on a single process. Mainly because we want to the server to run as a daemon.
 If we were to do one process with client/server thread, then we will need an active terminal, and that would allow the user to spawn a new client through a keystroke, but I don't we want to do that.
