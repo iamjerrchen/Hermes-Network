@@ -11,9 +11,14 @@ class Connection {
 
 private:
 
+    // Max buffer size indirectly determines max message length
+    // This influence is based on how we receive messages.
+    static const int MAX_BUF_LEN = 512;
     int fd; // file descriptor
     std::string ip; // ip address of other side of connection
     global_data * data; // pointer to global map of messages
+
+    int seek_divider(std::string message);
 
 public:
 

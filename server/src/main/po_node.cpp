@@ -13,8 +13,9 @@
 #include <iostream>
 
 /* 
- * @purpose:
- * 
+ * @purpose: server <- client
+ * 		Main function for a neighbor to server connection thread.
+ *		This is used when this node is acting a server to a neighbor client.
  * @param:
  *
  * @return:	
@@ -28,21 +29,22 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
 
 	// TODO: Spawn receive message and send message thread
 	// listen for messages and send messages simultaneously
-	while(1) // change to 1
-	{
+	// while(1) // change to 1
+	// {
 		if(stream->receive_message())
 		{
-			// stream->send_message();
+			stream->send_message();
 		}
-	}
+	// }
 
 
 	return;
 }
 
 /* 
- * @purpose:
+ * @purpose: client -> server
  * 		Main function for a server to neighbor connection thread.
+ *		This is used when this node is acting as a client to a neighbor server
  * @param:
  *
  * @return:	
