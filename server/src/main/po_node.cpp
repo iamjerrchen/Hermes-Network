@@ -79,3 +79,19 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
  	// close(sock_fd);
  	return true;
 }
+
+void start_client_conn(global_data * data)
+{
+	char buf[2048];
+	Socket client_listener;
+	client_listener.setup_server_socket(CLIENT_PORT);
+	while (1) {
+		int sock_fd = client_listener.accept_conn();
+		read(sock_fd, buf, 2048);
+		//TODO: Process buffer
+
+		std::string response = "bye";
+		write(sock_fd, response.c_str(), response.length());
+		close(sock_fd);
+	}
+}

@@ -6,24 +6,32 @@
 
 
 int main(int argc, char * argv[]) {
+	printf("hello");
 	if (argc > 4)
 		exit(EXIT_FAILURE);
+
+	int num_init_connections = argc - 1;
 
 	global_data globals;
 	globals.incoming_messages = new std::map<std::string,std::queue<std::string>>();
 	globals.outgoing_messages = new std::map<std::string,std::queue<std::string>>();
 
 	// Create client connection
+	printf("Creating client");
+	std::thread client_conn(start_client_conn, &globals);
 	
 	// Create node connections
-	for (int i = 1; i <= argc; i++) {
+	printf("Connecting to nodes");
+	for (int i = 1; i <= num_init_connections; i++) {
 		std::string ip(argv[i]);
 		std::thread new_conn(start_server_to_neighbor_conn, ip, &globals);
 		new_conn.detach();
 	}
 	
 	// create server socket
+	printf("Creating servers");
 	Socket server_listener;
+	server_listener.setup_server_socket(SERVER_PORT);
 	while (1) {
 		int sock_fd = -1;
 		if (globals.num_connections < 3) {
