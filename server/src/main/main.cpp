@@ -14,6 +14,7 @@ int main(int argc, char * argv[]) {
 	global_data globals;
 	globals.incoming_messages = new std::map<std::string,std::queue<std::string>*>();
 	globals.outgoing_messages = new std::map<std::string,std::queue<std::string>*>();
+	globals.num_connections = 0;
 
 	// Create client connection
 	std::thread client_conn(start_client_conn, &globals);
