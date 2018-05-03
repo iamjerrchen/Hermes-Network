@@ -19,10 +19,10 @@ On machine 2 at time t > 0:
 ```bin/main/p2p 192.168.1.10```
 
 To actually send messages run:
-```python client/main/client.py PUSH --to IP_ADDRESS --msg MESSAGE```
+```python client/src/main/client.py PUSH --to IP_ADDRESS --msg MESSAGE```
 
 To read your new messages run:
-```python client/main/client.py PULL```
+```python client/src/main/client.py PULL```
 
 ## Introduction
 We will be using the word Server and Node interchangeably.
