@@ -18,7 +18,7 @@ bool client_connection::process_push(std::string message) {
 	std::string message_contents = message.substr(msg_tag_start + 4);
 	
 	std::ostringstream stream;
-	stream << message_contents.length() << CODE_MSG_DIVIDER << STD_CODE << CODE_MSG_DIVIDER << message_contents;
+	stream << (message_contents.length() + 5) << CODE_MSG_DIVIDER << STD_CODE << CODE_MSG_DIVIDER << message_contents;
 
 	{
 		std::lock_guard<std::mutex> lock(data->out_lock);
@@ -46,6 +46,7 @@ void client_connection::process_pull(int sock_fd) {
 				msg = it->second->front();
 				msg_start = -1;
 				for (int i = 0; i < 2; i++) {
+					// Ignore message code for now
 					msg_start = msg.find_first_of(CODE_MSG_DIVIDER, msg_start + 1);
 				}
 

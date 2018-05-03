@@ -92,7 +92,7 @@ void Connection::receive_message()
 		}
 
 		msg_start.append(buffer, recv_len);
-		if((size_idx = seek_divider(msg_start)) < 0) {
+		if((size_idx = msg_start.find_first_of(CODE_MSG_DIVIDER)) < 0) {
 			syslog(LOG_WARNING, "[connection] Unable to find the end of message length metadata.");
 		}
 
@@ -104,7 +104,6 @@ void Connection::receive_message()
 		// read to end of message
 		curr_len = recv_len-(size_idx+1);
 		message = msg_start.substr(size_idx+1, curr_len);
-		std::cout<<"READ " << message<<std::endl;
 		while(curr_len < expected_len) {
 			recv_len = read(this->fd, buffer, MAX_BUF_LEN);
 			if(recv_len > 0) {
@@ -117,6 +116,7 @@ void Connection::receive_message()
 			curr_len += recv_len;
 		}
 
+		std::cout<<"READ " << message<<std::endl;
 		// Store message into local stack
 		{
 			std::lock_guard<std::mutex> lock(local_in);
@@ -143,10 +143,9 @@ void Connection::send_message()
 			local_outgoing_msg->pop();
 		}
 
-		// write message
 		// TODO: Longer messages
 		send_len = write(this->fd, msg.c_str(), msg.length());
-		std::cout << "SEND " << msg << " " << send_len << std::endl;
+		std::cout << "SEND " << msg << std::endl;
 		if(send_len < 0)
 		{
 			syslog(LOG_ERR, "[connection] Failed to write message to ip (%s): %s", (this->ip).c_str(), strerror(errno));
@@ -185,35 +184,4 @@ void Connection::handle_message()
 			}
 		}
 	}
-}
-
-/*
- * @purpose:
- *      
- *
- * @param:
- *      message: string starting with 4 character message code
- * 			followed by a variable message length count and another
- *			divider.
- *			ex. XX...XX|XXXX|MSG
- * @return: index to the end of the message length
- *      > 0: Valid index to the last message length number
- *      -1: Unable to find end of message length
- */
-int Connection::seek_divider(std::string message)
-{
-    bool found = false;
-    unsigned int idx;
-    for(idx = 0; idx < message.length(); idx++) {
-        if(message[idx] == CODE_MSG_DIVIDER) {
-            found = true;
-            break;
-        }
-    }
-
-    if(found) {
-        return int(idx);
-    }
-
-    return -1;
 }

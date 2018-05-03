@@ -21,8 +21,6 @@ private:
 	std::mutex local_in;
 	std::mutex local_out;
 
-    int seek_divider(std::string message);
-
 public:
 
     // constructor and destructor
