@@ -8,6 +8,7 @@
 #include <string.h>
 #include <syslog.h>
 #include <errno.h>
+#include <iostream>
 
 // project libraries
 #include "socket.h"
@@ -102,6 +103,7 @@ void Connection::receive_message()
 		// read to end of message
 		curr_len = recv_len-(size_idx+1);
 		message = msg_start.substr(size_idx+1, curr_len);
+		std::cout<<"READ " << message<<std::endl;
 		while(curr_len < expected_len) {
 			recv_len = read(this->fd, buffer, MAX_BUF_LEN);
 			if(recv_len > 0) {
@@ -139,17 +141,18 @@ void Connection::send_message()
 			local_outgoing_msg->pop();
 		}
 
-		// assuming popped message is in MSG_CODE|MESSAGE format
 		content_len = msg.length();
 		msg_header = std::to_string(content_len);
-		// temporary hard code, in the future implement format message method
+		// FIXME: temporary hard code, in the future implement format message method
 		msg_header += CODE_MSG_DIVIDER;
 		msg_header += STD_CODE;
 		msg_header += CODE_MSG_DIVIDER;
 		msg = msg_header + msg;
 
 		// write message
+		// TODO: Longer messages
 		send_len = write(this->fd, msg.c_str(), msg.length());
+		std::cout << "SEND " << msg << " " << send_len << std::endl;
 		if(send_len < 0)
 		{
 			syslog(LOG_ERR, "[connection] Failed to write message to ip (%s): %s", (this->ip).c_str(), strerror(errno));
