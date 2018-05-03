@@ -2,11 +2,9 @@
 #define P2P_MAIN_CONNECTION_H_
 
 #include <string.h>
-#include <stdio.h>
-#include <unistd.h>
 
-#include "socket.h"
 #include "global_data.h"
+
 class Connection {
 
 private:

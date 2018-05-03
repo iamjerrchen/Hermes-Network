@@ -6,14 +6,17 @@
 
 #include "socket.h"
 
+// standard libraries
 #include <stdio.h>
 #include <stdlib.h>
 #include <arpa/inet.h>
-
 // system logging
 #include <string.h>
 #include <syslog.h>
 #include <errno.h>
+
+// project libraries
+
 
 /* public
  * @purpose:

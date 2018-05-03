@@ -1,16 +1,21 @@
 #include "po_node.h"
 
-#include "global_data.h"
-#include "connection.h"
-
+// standard libraries
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <thread>
 // system logging
 #include <string.h>
 #include <syslog.h>
 #include <errno.h>
 #include <iostream>
+
+// project libraries
+#include "global_data.h"
+#include "connection.h"
+#include "socket.h"
+#include "client_connection.h"
 
 /* 
  * @purpose: server <- client

@@ -1,13 +1,17 @@
 #include "connection.h"
-#include "message_codes.h"
 
+// standard libraries
 #include <sstream>
-
+#include <unistd.h>
+#include <stdio.h>
+// system logging
 #include <string.h>
 #include <syslog.h>
 #include <errno.h>
 
-#include <iostream>
+// project libraries
+#include "socket.h"
+#include "message_codes.h"
 
 Connection::Connection(int fd, std::string ip, global_data * data)
 {    
@@ -140,7 +144,7 @@ void Connection::send_message()
 		msg =  std::to_string(content_len) + msg;
 
 		// write message
-		send_len = write(this->fd, msg.c_str(), msg_length());
+		send_len = write(this->fd, msg.c_str(), msg.length());
 		if(send_len < 0)
 		{
 			syslog(LOG_ERR, "[connection] Failed to write message to ip (%s): %s", (this->ip).c_str(), strerror(errno));
