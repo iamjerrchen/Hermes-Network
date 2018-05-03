@@ -20,6 +20,9 @@ private:
 	std::queue<std::string> * local_incoming_msg;
 	std::queue<std::string> * local_outgoing_msg;
 
+	std::mutex local_in;
+	std::mutex local_out;
+
     int seek_divider(std::string message);
 
 public:
@@ -31,8 +34,8 @@ public:
 
     // methods to interface with messages
     bool greet_neighbor();
-    bool receive_message();
-    bool send_message();
+    void receive_message();
+    void send_message();
     void handle_message();
 
 };

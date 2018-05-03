@@ -63,7 +63,7 @@ bool Connection::greet_neighbor()
     message += this->ip;
 
     // send greetings with message data
-    send_len = write(this->fd, message.c_str(), strlen(message.c_str()));
+    send_len = write(this->fd, message.c_str(), message.length());
     if(send_len < 0) {
         syslog(LOG_ERR, "[connection] Failed to write to ip (%s): %s", (this->ip).c_str(), strerror(errno));
         return false;
@@ -71,56 +71,73 @@ bool Connection::greet_neighbor()
     return true; // if sent otherwise false
 }
 
-// TODO: Should be a while loop
-// receive and handle messages
-bool Connection::receive_message()
+// receive and locally save messages
+void Connection::receive_message()
 {
-    bool status = false;
     int recv_len, size_idx, expected_len, curr_len;
     std::string message, msg_start;
     char buffer[MAX_BUF_LEN];
 
-    // read a portion of the message for examination
-	recv_len = read(this->fd, buffer, MAX_BUF_LEN);
-	msg_start.append(buffer, recv_len);
-	if((size_idx = seek_divider(msg_start)) < 0) {
-		syslog(LOG_WARNING, "[connection] Unable to find the end of message length metadata.");
-		return false;
+	while (1) {
+		// read a portion of the message for examination
+		recv_len = read(this->fd, buffer, MAX_BUF_LEN);
+		if (recv_len == 0) {
+			continue;
+		}
+
+		msg_start.append(buffer, recv_len);
+		if((size_idx = seek_divider(msg_start)) < 0) {
+			syslog(LOG_WARNING, "[connection] Unable to find the end of message length metadata.");
+		}
+
+		// convert from string to int
+		std::string message_length = msg_start.substr(0,size_idx);
+		std::stringstream str_int(message_length);
+		str_int >> expected_len;
+
+		// read to end of message
+		curr_len = recv_len-(size_idx+1);
+		message = msg_start.substr(size_idx+1, curr_len);
+		while(curr_len < expected_len) {
+			recv_len = read(this->fd, buffer, MAX_BUF_LEN);
+			if(recv_len > 0) {
+				message.append(buffer, recv_len);
+			}
+			else if(recv_len < 0) {
+				syslog(LOG_ERR, "[connection] Failed to read from ip (%s): %s", (this->ip).c_str(), strerror(errno));
+				return;
+			}
+			curr_len += recv_len;
+		}
+
+		// Store message into local stack
+		{
+			std::lock_guard<std::mutex> lock(local_in);
+			local_incoming_msg->push(message);
+		}
 	}
-
-	// convert from string to int
-	std::string message_length = msg_start.substr(0,size_idx);
-	std::stringstream str_int(message_length);
-	str_int >> expected_len;
-
-    // read to end of message
-	curr_len = recv_len-(size_idx+1);
-	message = msg_start.substr(size_idx+1, curr_len);
-    while(curr_len < expected_len) {
-    	recv_len = read(this->fd, buffer, MAX_BUF_LEN);
-        if(recv_len > 0) {
-            message.append(buffer, recv_len);
-            status = true;
-        }
-        else if(recv_len < 0) {
-            syslog(LOG_ERR, "[connection] Failed to read from ip (%s): %s", (this->ip).c_str(), strerror(errno));
-            return false;
-        }
-    	curr_len += recv_len;
-    }
-
-	// Store message into local stack
-	local_incoming_msg->push(message);
-    return status;
 }
 
-// TODO: Should be a while loop and threaded
 // send a message to neighbor
-bool Connection::send_message()
+void Connection::send_message()
 {
-    char* buffer = "Got your message";
-    int n = write(this->fd, buffer, strlen(buffer));
-    return true;
+	std::string msg;
+
+	while (1) {
+		{
+			std::lock_guard<std::mutex> lock(local_out);
+			if (local_outgoing_msg->empty()) {
+				continue;
+			}
+
+			msg = local_outgoing_msg->front();
+			local_outgoing_msg->pop();
+		}
+
+		// FIXME: Format message into proper protocol
+		// TODO: Error checking
+		write(fd, msg.c_str(), msg.length());
+	}
 }
 
 // Worker thread that updates the 2 queues
@@ -131,17 +148,21 @@ void Connection::handle_message()
 		sleep(5);
 
 		// Push all local messages to the global map
-		if (!local_incoming_msg->empty()) {
-			std::lock_guard<std::mutex> lock(data->in_lock);
-			while (!local_incoming_msg->empty()) {
-				data->incoming_messages->at(ip)->push(local_incoming_msg->front());
-				local_incoming_msg->pop();
+		{
+			std::lock_guard<std::mutex> lock(local_in);
+			if (!local_incoming_msg->empty()) {
+				std::lock_guard<std::mutex> lock(data->in_lock); // Should not always need to be grabbed
+				while (!local_incoming_msg->empty()) {
+					data->incoming_messages->at(ip)->push(local_incoming_msg->front());
+					local_incoming_msg->pop();
+				}
 			}
 		}
 
 		// Pull pending messages from the global map
 		{
-			std::lock_guard<std::mutex> lock(data->out_lock);
+			std::lock_guard<std::mutex> lock_external(data->out_lock);
+			std::lock_guard<std::mutex> lock_internal(local_out); // Grab this second as it should be faster to get
 			while (!data->outgoing_messages->at(ip)->empty()) {
 				local_outgoing_msg->push(data->outgoing_messages->at(ip)->front());
 				data->outgoing_messages->at(ip)->pop();
@@ -149,7 +170,6 @@ void Connection::handle_message()
 		}
 	}
 }
-
 
 /*
  * @purpose:

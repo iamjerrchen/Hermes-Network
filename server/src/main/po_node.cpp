@@ -34,9 +34,9 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
 	}
 	Connection *stream = new Connection(sock_fd, ip, data);
 
-	std::thread handle_thread = std::thread(stream->handle_message, stream);
-	std::thread recv_thread = std::thread(stream->receive_message, stream);
-	std::thread send_thread = std::thread(stream->send_message, stream);
+	std::thread handle_thread = std::thread(&Connection::handle_message, stream);
+	std::thread recv_thread = std::thread(&Connection::receive_message, stream);
+	std::thread send_thread = std::thread(&Connection::send_message, stream);
 
 	handle_thread.join();
 	recv_thread.join();
@@ -64,7 +64,7 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
 	{
 		std::lock_guard<std::mutex> lock(data->conn_lock);
 		if (data->num_connections >= 3) {
-			return;
+			return false;
 		}
 		data->num_connections++;
 	}
@@ -82,9 +82,9 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
  	// send initialization message
  	stream->greet_neighbor();
 
-	std::thread handle_thread = std::thread(stream->handle_message, stream);
-	std::thread recv_thread = std::thread(stream->receive_message, stream);
-	std::thread send_thread = std::thread(stream->send_message, stream);
+	std::thread handle_thread = std::thread(&Connection::handle_message, stream);
+	std::thread recv_thread = std::thread(&Connection::receive_message, stream);
+	std::thread send_thread = std::thread(&Connection::send_message, stream);
 
 	handle_thread.join();
 	recv_thread.join();
