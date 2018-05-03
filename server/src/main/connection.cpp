@@ -121,6 +121,7 @@ void Connection::receive_message()
 // send a message to neighbor
 void Connection::send_message()
 {
+	int content_len, send_len;
 	std::string msg;
 
 	while (1) {
@@ -134,9 +135,17 @@ void Connection::send_message()
 			local_outgoing_msg->pop();
 		}
 
-		// FIXME: Format message into proper protocol
-		// TODO: Error checking
-		write(fd, msg.c_str(), msg.length());
+		// assuming popped message is in MSG_CODE|MESSAGE format
+		content_len = msg.length();
+		msg =  std::to_string(content_len) + msg;
+
+		// write message
+		send_len = write(this->fd, msg.c_str(), msg_length());
+		if(send_len < 0)
+		{
+			syslog(LOG_ERR, "[connection] Failed to write message to ip (%s): %s", (this->ip).c_str(), strerror(errno));
+			return;
+		}
 	}
 }
 
