@@ -63,13 +63,13 @@ void client_connection::process_pull(int sock_fd) {
 
 void client_connection::process_request(int sock_fd, std::string request) {
 	std::string operation = request.substr(0,4);
-	if (operation == "PUSH") {
+	if (operation == CLIENT_PUSH) {
 		if (process_push(request.substr(5))) {
 			write(sock_fd, "SUCCESS", 7);
 		} else {
 			write(sock_fd, "FAIL", 4);
 		}
-	} else if (operation == "PULL") {
+	} else if (operation == CLIENT_PULL) {
 		process_pull(sock_fd);
 	} else {
 		write(sock_fd, "FAIL", 4);

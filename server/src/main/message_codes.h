@@ -16,8 +16,8 @@
 
 
 // Client Connection Operations
-#define CLIENT_PUSH "PUSH"
-#define CLIENT_PULL "PULL"
+#define CLIENT_PUSH "PUSH" // Initiated by client to write new messages to the message queue
+#define CLIENT_PULL "PULL" // Initiated by client to retrieve the queue of messages for the client
 
 
 

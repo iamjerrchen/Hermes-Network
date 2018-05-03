@@ -1,5 +1,7 @@
 #ifndef CLIENT_CONNECTION_H_
 #define CLIENT_CONNECTION_H_
+
+#include "message_codes.h"
 #include "global_data.h"
 #include <iostream>
 #include <unistd.h>
