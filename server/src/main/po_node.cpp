@@ -82,16 +82,26 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
 
 void start_client_conn(global_data * data)
 {
+	int sock_fd;
 	char buf[2048];
+
+	client_connection connection = client_connection(data);
 	Socket client_listener;
 	client_listener.setup_server_socket(CLIENT_PORT);
 	while (1) {
-		int sock_fd = client_listener.accept_conn();
-		read(sock_fd, buf, 2048);
-		//TODO: Process buffer
+		if ((sock_fd = client_listener.accept_conn()) < 0) {
+			continue;
+		}
 
-		std::string response = "bye";
-		write(sock_fd, response.c_str(), response.length());
+		int request_length = read(sock_fd, buf, 2048);
+		if (request_length == 0) {
+			printf("Nothing has been read\n");
+			write(sock_fd, "FAIL", 4);
+		} else {
+			std::string request = std::string(buf);
+			connection.process_request(sock_fd, request);
+		}
+
 		close(sock_fd);
 	}
 }

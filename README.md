@@ -61,14 +61,18 @@ PULL retrieves all messages from the server back to the client The client reques
 The server response is formatted as such:
 	FAIL # Connection is immediately terminated
 
-	SUCCESS <number of messages>
+	SUCCESS <number of messages> # can be 0
 	IP: <SRC-IP> MSG:<message 0>
 	IP: <SRC-IP> MSG:<message 1>
 	IP: <SRC-IP> MSG:<message n> # connection is terminated after this send
 The client must make successive reads on the socket to get all of its messages
 
 
-
+#### Future client node considerations
+* Have client be able to submit multiple messages
+* Have client be able to pull messages from a given timeframe
+* Have client be able to write a message of unlimited length
+* PRIORITY: Verify the request came from localhost
 
 ### Node Design
 

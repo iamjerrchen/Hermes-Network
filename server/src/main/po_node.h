@@ -3,6 +3,8 @@
 
 #include "global_data.h"
 #include "socket.h"
+#include "client_connection.h"
+
 
 #include <thread>
 
@@ -14,8 +16,8 @@ static const unsigned int MAX_NEIGHBORS = 3;
 
 
 void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* data);
-void start_client_conn(global_data * data);
 bool start_server_to_neighbor_conn(std::string ip, global_data* data);
+void start_client_conn(global_data * data);
 
 
 #endif
