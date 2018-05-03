@@ -117,6 +117,7 @@ void Connection::receive_message()
 		}
 
 		std::cout<<"READ " << message<<std::endl;
+		bzero(buffer, MAX_BUF_LEN);
 		// Store message into local stack
 		{
 			std::lock_guard<std::mutex> lock(local_in);
