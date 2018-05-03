@@ -45,6 +45,30 @@ Message codes - Logistical/meta messages, normal messages (How do we keep track 
 
 Drop List when receiving a broadcast of messages received. (figure out when to flush droplist) This is to drop messages that are still propagating after being received by the client. Maintain a healthy network
 
+### Client to Node Protocol
+Node sets up a server socket that accepts connections from the local client. All interactions are handled with a simple client request and server response. The socket connection is immediately terminated afterwards.
+
+The client prefaces its request with either PUSH or PULL. 
+PUSH writes a single message to the specified IP. The client request is formatted as such:
+	PUSH IP:<DESTINATION-IP> MSG:<message contents>
+The server response is formatted as one of the two following:
+	SUCCESS
+
+	FAIL
+
+PULL retrieves all messages from the server back to the client The client request is formatted as such:
+	PULL
+The server response is formatted as such:
+	FAIL # Connection is immediately terminated
+
+	SUCCESS <number of messages>
+	IP: <SRC-IP> MSG:<message 0>
+	IP: <SRC-IP> MSG:<message 1>
+	IP: <SRC-IP> MSG:<message n> # connection is terminated after this send
+The client must make successive reads on the socket to get all of its messages
+
+
+
 
 ### Node Design
 
