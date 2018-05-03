@@ -79,6 +79,7 @@ bool Connection::greet_neighbor()
 // receive and locally save messages
 void Connection::receive_message()
 {
+	std::cout<<"Starting recv message thread" <<std::endl;
     int recv_len, size_idx, expected_len, curr_len;
     std::string message, msg_start;
     char buffer[MAX_BUF_LEN];
@@ -127,6 +128,7 @@ void Connection::receive_message()
 // send a message to neighbor
 void Connection::send_message()
 {
+	std::cout<<"Starting send message thread" <<std::endl;
 	int content_len, send_len;
 	std::string msg, msg_header;
 
