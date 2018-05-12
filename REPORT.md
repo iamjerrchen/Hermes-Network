@@ -5,6 +5,7 @@ Tim Hostetler (thostet2)
 Rohit Thotakura (thotaku2)
 
 ## How-To-Use
+Create the following directory to hold the executables in the root folder of this project: bin/main/p2p
 Run ```make``` in the root directory of the project to build the standard application. 
 The node can be started by running ```bin/main/p2p```
 If this node is the first node to be started on the network, the above command will set it up fine.
@@ -46,7 +47,7 @@ Joining/Leaving Network Protocol
 Security Concerns
 
 ### Local Client
-The Local Client is the interface that the user uses to interact with the network and the other users. The Client is implemented using Python and the interface uses the command line interface (CLI) to send messages through sockets to the Local Server. The user has the option to push (sending) messages to the server or pop (receiving) messages from the server. When pushing messages to the server, the user will also specify the ip of the user, which is the destination of the message they are pushing.
+The Local Client is the interface that the user uses to interact with the network and the other users. The Client is implemented using Python and the interface uses the command line interface (CLI) to send messages through sockets to the Local Server. The user has the option to push (sending) messages to the Server or pop (receiving) messages from the Server. When pushing messages to the Server, the user will also specify the ip of the user, which is the destination of the message they are pushing.
 
 ### Local Server
 The Local Server serves two main purposes: sends messages pushed by the Local Client and receive messages sent by Neighbor Servers (the relation between Local Server and Neighbor Server will be detailed in the Network Structure component). When sending messages, it will be sent to all Neighbor servers hoping it reaches the intended recipient. When receiving messages, The Local Server will decide whether it is the intended recipient. If it is the intended recipient, it will read the message’s metadata in the header (explained in the Message Structure component) and decide whether it’s a standard message that needs to be stored for the client to pull or an instruction intended for the server to respond to. If Local Server isn’t the intended recipient, it will reroute the message to all its neighbors except for the sending neighbor.
