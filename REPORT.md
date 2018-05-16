@@ -35,6 +35,9 @@ The users will host their own servers and connect them to the network. The users
 
 There are several features that we wanted to incorporate into the the network, but due the number of times the design has been rewritten and the time constraints, we were only able to implement the basic idea of the project using simple protocols. To supplement our code, we would like to provide the fleshed out design of the peer-to-peer network and describe what we were able to implement.
 
+## Architecture Diagram
+![Architecture Diagram](https://github.com/jerr-chen/p2p_messaging_network/blob/master/images/p2p_architecture.PNG "Architecture Diagram")
+
 ## Design
 The design goals of the peer-to-peer network can be broken down in different components:
     Local Client
