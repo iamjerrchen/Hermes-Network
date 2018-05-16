@@ -39,6 +39,7 @@ void client_connection::process_pull(int sock_fd) {
 	std::queue<std::string> local_message_queue = std::queue<std::string>();
 
 	{
+		// pull all messages from the queue intended for client
 		std::lock_guard<std::mutex> lock(data->in_lock);
 		for(std::map<std::string,std::queue<std::string>*>::iterator it = data->incoming_messages->begin(); it != data->incoming_messages->end(); it++) {
 			std::string msg;

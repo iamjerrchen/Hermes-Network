@@ -8,6 +8,8 @@
 #include <mutex>
 
 struct global_data {
+	std::string my_ip;
+
 	std::mutex in_lock;
 	std::mutex out_lock;
 	std::mutex conn_lock;

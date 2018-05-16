@@ -23,13 +23,14 @@ Connection::Connection(int fd, std::string ip, global_data * data)
 	this->local_incoming_msg = new std::queue<std::string>();
 	this->local_outgoing_msg = new std::queue<std::string>();
 
-	// Initialize global maps for this IP
+	// Initialize global maps for this IP if it hasn't been assigned
 	{
 		std::lock_guard<std::mutex> lock(data->in_lock);
 		if (data->incoming_messages->count(ip) == 0) {
 			data->incoming_messages->insert(std::pair<std::string, std::queue<std::string>*>(ip, new std::queue<std::string>()));
 		}
 	}
+
 	{
 		std::lock_guard<std::mutex> lock(data->out_lock);
 		if (data->outgoing_messages->count(ip) == 0) {
@@ -43,11 +44,12 @@ Connection::~Connection() {
 	delete local_incoming_msg;
 	delete local_outgoing_msg;
 
-	// Remove global objects
+	// Remove global message queue for specified IP
 	{
 		std::lock_guard<std::mutex> lock(data->in_lock);
 		delete data->incoming_messages->at(ip);
 	}
+
 	{
 		std::lock_guard<std::mutex> lock(data->out_lock);
 		delete data->outgoing_messages->at(ip);
@@ -65,7 +67,7 @@ bool Connection::greet_neighbor()
     message += CODE_MSG_DIVIDER;
     message += INIT_CODE;
     message += CODE_MSG_DIVIDER;
-    message += this->ip;
+    message += this->ip; // TODO: change to this server's ip
 
     // send greetings with message data
     send_len = write(this->fd, message.c_str(), message.length());
@@ -79,7 +81,7 @@ bool Connection::greet_neighbor()
 // receive and locally save messages
 void Connection::receive_message()
 {
-	std::cout<<"Starting recv message thread" <<std::endl;
+	syslog(LOG_NOTICE, "[connection] Started receive message thread for ip (%s).", (this->ip).c_str());
     int recv_len, size_idx, expected_len, curr_len;
     std::string message, msg_start;
     char buffer[MAX_BUF_LEN];
@@ -92,13 +94,15 @@ void Connection::receive_message()
 			continue;
 		}
 
+		// construct incoming message
 		msg_start.append(buffer, recv_len);
 		if((size_idx = msg_start.find_first_of(CODE_MSG_DIVIDER)) < 0) {
-			syslog(LOG_WARNING, "[connection] Unable to find the end of message length metadata.");
+			syslog(LOG_WARNING, "[connection] Unable to find the end of message length metadata. Ignoring message.");
+			continue;
 		}
 
-		// convert from string to int
-		std::string message_length = msg_start.substr(0,size_idx);
+		// convert message length from string to int
+		std::string message_length = msg_start.substr(0, size_idx);
 		std::stringstream str_int(message_length);
 		str_int >> expected_len;
 
@@ -117,8 +121,8 @@ void Connection::receive_message()
 			curr_len += recv_len;
 		}
 
-		std::cout<<"READ " << message<<std::endl;
-		bzero(buffer, MAX_BUF_LEN);
+		std::cout << "READ " << message << std::endl;
+		bzero(buffer, MAX_BUF_LEN); // clear buffer
 		// Store message into local stack
 		{
 			std::lock_guard<std::mutex> lock(local_in);
@@ -130,11 +134,12 @@ void Connection::receive_message()
 // send a message to neighbor
 void Connection::send_message()
 {
-	std::cout<<"Starting send message thread" <<std::endl;
+	syslog(LOG_NOTICE, "[connection] Started send message thread for ip (%s).", (this->ip).c_str());
 	int content_len, send_len;
 	std::string msg, msg_header;
 
 	while (1) {
+		// retrieve messages provided by the client for sending.
 		{
 			std::lock_guard<std::mutex> lock(local_out);
 			if (local_outgoing_msg->empty()) {
@@ -159,13 +164,15 @@ void Connection::send_message()
 // Worker thread that updates the 2 queues
 void Connection::handle_message()
 {
-	std::cout << "Starting handle message thread" << std::endl;
+	syslog(LOG_NOTICE, "[connection] Started handling message thread.");
+	
 	while(1) {
 		// Check to update structures every 5 seconds
 		sleep(5);
 
 		// Push all local messages to the global map
 		{
+			// local_incoming_msg => global_incoming_msg
 			std::lock_guard<std::mutex> lock(local_in);
 			if (!local_incoming_msg->empty()) {
 				std::lock_guard<std::mutex> lock(data->in_lock); // Should not always need to be grabbed
@@ -178,6 +185,7 @@ void Connection::handle_message()
 
 		// Pull pending messages from the global map
 		{
+			// global_outgoing_msg => local_outgoing_msg
 			std::lock_guard<std::mutex> lock_external(data->out_lock);
 			std::lock_guard<std::mutex> lock_internal(local_out); // Grab this second as it should be faster to get
 			while (!data->outgoing_messages->at(ip)->empty()) {

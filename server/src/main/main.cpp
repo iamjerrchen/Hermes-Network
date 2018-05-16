@@ -6,11 +6,15 @@
 
 
 int main(int argc, char * argv[]) {
-	if (argc > 4)
+	if (argc > 4) {
+		printf("Usage: ./p2p [Optional IP 1] [Optional IP 2] [Optional IP 3]\n");
 		exit(EXIT_FAILURE);
+	}
 
+	// TODO: Validate addresses
 	int num_init_connections = argc - 1;
 
+	// Initialize shared resource
 	global_data globals;
 	globals.incoming_messages = new std::map<std::string,std::queue<std::string>*>();
 	globals.outgoing_messages = new std::map<std::string,std::queue<std::string>*>();
