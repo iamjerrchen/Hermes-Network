@@ -9,6 +9,7 @@
 
 
 std::vector<std::string> extract_message(std::string msg, int delimiter_ct);
+std::string construct_msg(std::vector<std::string> tokens);
 
 
 #endif
