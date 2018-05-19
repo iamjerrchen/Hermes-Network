@@ -7,8 +7,8 @@
 // jump table
 // std::string construct_message_header(int msg_len, const char *code);
 
-
-std::vector<std::string> extract_message(std::string msg, int delimiter_ct);
+int str_to_int(std::string num);
+std::vector<std::string> tokenize_msg(std::string msg, int delimiter_ct);
 std::string construct_msg(std::vector<std::string> tokens);
 
 

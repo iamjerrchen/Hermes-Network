@@ -80,21 +80,3 @@ std::string construct_msg(std::vector<std::string> tokens)
 }
 
 
-int main()
-{
-	std::vector<std::string> tokens;
-	std::string tok;
-
-	tok = "555";
-	tokens.push_back(tok);
-	tok = "444";
-	tokens.push_back(tok);
-	tok = "222";
-	tokens.push_back(tok);
-
-	tok = construct_msg(tokens);
-	std::cout << tok << std::endl;
-	return 0;
-}
-
-

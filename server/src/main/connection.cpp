@@ -4,6 +4,7 @@
 #include <sstream>
 #include <unistd.h>
 #include <stdio.h>
+#include <vector>
 // system logging
 #include <string.h>
 #include <syslog.h>
@@ -13,6 +14,7 @@
 // project libraries
 #include "socket.h"
 #include "message_codes.h"
+#include "message_formatter.h"
 
 Connection::Connection(int fd, std::string ip, global_data * data)
 {    
@@ -79,10 +81,12 @@ bool Connection::greet_neighbor()
 }
 
 // receive and locally save messages
+// the message save contains the message code and message
 void Connection::receive_message()
 {
 	syslog(LOG_NOTICE, "[connection] Started receive message thread for ip (%s).", (this->ip).c_str());
-    int recv_len, size_idx, expected_len, curr_len;
+    int recv_len, expected_len, curr_len;
+    std::vector<std::string> tokens;
     std::string message, msg_start;
     char buffer[MAX_BUF_LEN];
 
@@ -94,21 +98,20 @@ void Connection::receive_message()
 			continue;
 		}
 
-		// construct incoming message
+		// separate meta data and message
 		msg_start.append(buffer, recv_len);
-		if((size_idx = msg_start.find_first_of(CODE_MSG_DIVIDER)) < 0) {
+		tokens = tokenize_msg(msg_start, 1);
+		if(tokens.size() == 1) {
 			syslog(LOG_WARNING, "[connection] Unable to find the end of message length metadata. Ignoring message.");
 			continue;
 		}
 
 		// convert message length from string to int
-		std::string message_length = msg_start.substr(0, size_idx);
-		std::stringstream str_int(message_length);
-		str_int >> expected_len;
+		expected_len = str_to_int(tokens[0]);
 
 		// read to end of message
-		curr_len = recv_len-(size_idx+1);
-		message = msg_start.substr(size_idx+1, curr_len);
+		curr_len = recv_len-((tokens[0]).size()+1);
+		message = tokens[1];
 		while(curr_len < expected_len) {
 			recv_len = read(this->fd, buffer, MAX_BUF_LEN);
 			if(recv_len > 0) {
@@ -165,7 +168,7 @@ void Connection::send_message()
 void Connection::handle_message()
 {
 	syslog(LOG_NOTICE, "[connection] Started handling message thread.");
-	
+
 	while(1) {
 		// Check to update structures every 5 seconds
 		sleep(5);
