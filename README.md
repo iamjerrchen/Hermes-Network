@@ -1,4 +1,4 @@
-# p2p_messaging_network
+# Hermes Network
 
 If you are looking for the final project report, read REPORT.md instead
 
