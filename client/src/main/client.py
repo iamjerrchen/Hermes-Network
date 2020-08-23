@@ -17,24 +17,24 @@ def main():
 	sock.connect(("localhost",PORT))
 
 	if args.method == "PULL":
-		sock.send("PULL")
+		sock.send("PULL".encode(encoding="UTF-8", errors="strict"))
 		resp = sock.recv(2048)
-		print resp
+		print(resp)
 		if resp == "FAIL":
-			print "Pull failed"
+			print("Pull failed")
 		num_msg = int(resp[8:])
 		for _i in range(num_msg):
-			print sock.recv(2048)
+			print(sock.recv(2048))
 		# TODO: Parse messages to print out nicely
 		# TODO: if queue is too big, make successive reads
 		# TODO: Ensure we have gotten all messages
 
 	elif args.method == "PUSH":
 		request_str = "PUSH " + "IP:" + args.to + " MSG:" + args.msg
-		print request_str
-		sock.send(request_str)
+		print(request_str)
+		sock.send(request_str.encode(encoding="UTF-8", errors="strict"))
 		resp = sock.recv(2048)
-		print "Response %s" % (resp)
+		print("Response %s" % (resp))
 
 if __name__ == "__main__":
 	main()
