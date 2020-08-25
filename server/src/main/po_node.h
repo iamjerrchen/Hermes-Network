@@ -10,6 +10,12 @@ static const unsigned int CLIENT_PORT = 60085; // port to communicate to user
 static const unsigned int SERVER_PORT = 43110; // port we bind to
 static const unsigned int MAX_NEIGHBORS = 3;
 
+static const unsigned int MAX_SERVER_CONNECTIONS = MAX_NEIGHBORS;
+
+// MAX BUFFER SIZES
+static const unsigned int MAX_CLIENT_BUF_LEN = 2048;
+static const unsigned int MAX_SERVER_BUF_LEN = 2048;
+
 
 void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* data);
 bool start_server_to_neighbor_conn(std::string ip, global_data* data);
