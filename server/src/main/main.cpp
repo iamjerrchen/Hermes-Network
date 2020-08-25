@@ -6,7 +6,7 @@
 
 
 int main(int argc, char * argv[]) {
-	if (argc > 4) {
+	if (argc > (MAX_SERVER_CONNECTIONS + 1)) {
 		printf("Usage: ./p2p [Optional IP 1] [Optional IP 2] [Optional IP 3]\n");
 		exit(EXIT_FAILURE);
 	}

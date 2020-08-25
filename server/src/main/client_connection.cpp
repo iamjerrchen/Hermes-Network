@@ -5,7 +5,7 @@ client_connection::client_connection(global_data * data) {
 }
 
 bool client_connection::process_push(std::string message) {
-	if (message.substr(0,3) != "IP:") {
+	if (message.substr(0, 3) != "IP:") {
 		return false;
 	}
 
@@ -74,7 +74,7 @@ void client_connection::process_pull(int sock_fd) {
 }
 
 void client_connection::process_request(int sock_fd, std::string request) {
-	std::string operation = request.substr(0,4);
+	std::string operation = request.substr(0, 4);
 	if (operation == CLIENT_PUSH) {
 		if (process_push(request.substr(5))) {
 			write(sock_fd, "SUCCESS", 7);

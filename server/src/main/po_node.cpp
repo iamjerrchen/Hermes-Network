@@ -5,6 +5,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <thread>
+
 // system logging
 #include <string.h>
 #include <syslog.h>
@@ -32,7 +33,7 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
 	// With this implementation, its possible for a connection to be accepted followed by being immediately terminated
 	{
 		std::lock_guard<std::mutex> lock(data->conn_lock);
-		if (data->num_connections >= 3) {
+		if (data->num_connections >= MAX_SERVER_CONNECTIONS) {
 			close(sock_fd);
 			return;
 		}
@@ -71,7 +72,7 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
 	std::cout<<"Starting connection thread with " << ip << std::endl;
 	{
 		std::lock_guard<std::mutex> lock(data->conn_lock);
-		if (data->num_connections >= 3) {
+		if (data->num_connections >= MAX_SERVER_CONNECTIONS) {
 			return false;
 		}
 		data->num_connections++;
@@ -111,7 +112,7 @@ void start_neighbor_to_server_conn(std::string ip, int sock_fd, global_data* dat
 void start_client_conn(global_data * data)
 {
 	int sock_fd;
-	char buf[2048];
+	char buf[MAX_CLIENT_BUF_LEN];
 
 	client_connection connection = client_connection(data);
 	Socket client_listener;
@@ -121,7 +122,7 @@ void start_client_conn(global_data * data)
 			continue;
 		}
 
-		int request_length = read(sock_fd, buf, 2048);
+		int request_length = read(sock_fd, buf, MAX_CLIENT_BUF_LEN);
 		if (request_length == 0) {
 			printf("Nothing has been read\n");
 			write(sock_fd, "FAIL", 4);
